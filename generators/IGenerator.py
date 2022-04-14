@@ -26,6 +26,7 @@ class IGenerator(object):
             # these pdbs does not exists
             if pdb_id=="6qwj": continue
             if pdb_id=="1ejg": continue
+            if pdb_id=="7v7y": continue
             
             print(f"Row:{i+1} -> {pdb_id}:{chain_id}")
 
