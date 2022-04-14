@@ -29,8 +29,8 @@ class DownloadCleanFasta(IGenerator):
 
 inp_file_path = "data/splits/all.txt"
 out_file_path = "data/splits/all_clean.txt"
-n_rows_to_skip = 0
-n_rows_to_evalutate = 5000
+n_rows_to_skip = 30634
+n_rows_to_evalutate = 1
 df = pd.read_csv(inp_file_path)
 
 i = 11 #0-based index

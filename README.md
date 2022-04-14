@@ -21,3 +21,5 @@
 * If DSSP cannot compute SS/RASA for a residue_id, the value is set as SS="-" (Coil) and RASA=0.5 (neither exposed nor buried).
 * If an atom (i.e CA or CB) is not found while computing Contact-map, the value is set as 0.0 as they are in contact.
 * If a chain region looks like this "A:1-272,A:312-378", skip.
+* 6qwj: does not exist
+* 1ejg: Bio.PDB.PDBExceptions.PDBConstructionException: Blank altlocs in duplicate residue SER (' ', 22, ' ')

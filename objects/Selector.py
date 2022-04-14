@@ -102,20 +102,42 @@ class ChainAndRegionSelect(Select):
         elif region.count("-")==2: 
             loc = region.index("-", region.index("-")+1)
             start, end = region[:loc], region[loc+1:]
-        else: raise
+        else: 
+            raise NotImplementedError()
 
-        self.region_range = range(int(start), int(end)+1)
+        if start.isdigit():
+            self.start_residue_id = (" ", int(start), " ")
+        else: 
+            self.start_residue_id = (" ", int(start[:-1]), start[-1])
+        if end.isdigit():
+            self.end_residue_id = (" ", int(end), " ")
+        else: 
+            self.end_residue_id = (" ", int(end[:-1]), end[-1])
+        # self.region_range = range(int(start), int(end)+1)
 
     def  accept_chain(self, chain):
         # print(chain.id, self.chain_id)
         if chain.id == self.chain_id:
+            # creating region residue list
+            # print(self.start_residue_id)
+            # print(self.end_residue_id)
+            flag = False
+            self.region_residue_list = []
+            for residue in chain.get_residues():
+                # print(residue.id)
+                if residue.id == self.start_residue_id: flag=True
+                elif residue.id == self.end_residue_id: 
+                    self.region_residue_list.append(residue)
+                    break
+                if flag: self.region_residue_list.append(residue)
             return 1
         else:
             return 0
     
     def accept_residue(self, residue):
-        hetero_flag, sequence_identifier, insertion_code = residue.id
-        if residue.get_resname() in standard_aa_names and sequence_identifier in self.region_range:
+        # print(self.region_residue_list)
+        # raise
+        if residue.get_resname() in standard_aa_names and residue in self.region_residue_list:
             # print(residue.get_resname())
             return 1
         else:
