@@ -33,10 +33,10 @@ n_rows_to_skip = 0
 n_rows_to_evalutate = 1000
 df = pd.read_csv(inp_file_path)
 
-i = 11001 #0-based index
+i = 11 #0-based index
 if "SLURM_ARRAY_TASK_ID" in os.environ:
     i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
 
 dcf = DownloadCleanFasta()
-dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
-# dcf.do_distributed(i, df)
+# dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
+dcf.do_distributed(i, df)

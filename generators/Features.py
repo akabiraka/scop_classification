@@ -37,15 +37,15 @@ class Features(IGenerator):
         Utils.save_as_pickle(features, out_feature_file)
         print(f"    Features: {features.shape}")
 
-inp_file_path = "data/splits/all_clean.txt"
+inp_file_path = "data/splits/all.txt"
 n_rows_to_skip = 0
 n_rows_to_evalutate = 1000
 df = pd.read_csv(inp_file_path)
 
-i = 10 #0-based index
+i = 11 #0-based index
 if "SLURM_ARRAY_TASK_ID" in os.environ:
     i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
 
 cd = Features()
-cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate)
-# cd.do_distributed(i, df)
+# cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate)
+cd.do_distributed(i, df)

@@ -29,10 +29,12 @@ class IGenerator(object):
     
     def do_distributed(self, i, df):
         row = df.loc[i]
-        pdb_id, chain_id = row.PDBchain[:4].lower(), row.PDBchain[4:]
+        pdb_id, chain_and_region = row["FA-PDBID"].lower(), row["FA-PDBREG"].split(":")
+        chain_id, region = chain_and_region[0], chain_and_region[1]
         if len(chain_id)>1: return
+        if pdb_id == "3iyo": return
         print(f"Row:{i} -> {pdb_id}:{chain_id}")
-        self.do(pdb_id, chain_id)
+        self.do(pdb_id, chain_id, region)
 
 # gen = IGenerator()
 # gen.do(4rek, A)
