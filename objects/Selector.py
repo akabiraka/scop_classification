@@ -131,18 +131,19 @@ class ChainAndRegionSelect(Select):
             self.region_residue_list = []
             for residue in chain.get_residues():
                 # print(residue.id)
-                if residue.id == self.start_residue_id: flag=True
-                elif residue.id == self.end_residue_id: 
+                hetero_flag, seq_id, insertion_code = residue.id
+                if seq_id==self.start_residue_id[1] and insertion_code==self.start_residue_id[2]: 
+                    flag=True
+                elif seq_id==self.end_residue_id[1] and insertion_code==self.end_residue_id[2]:
                     self.region_residue_list.append(residue)
                     break
                 if flag: self.region_residue_list.append(residue)
+            # print(self.region_residue_list)
             return 1
         else:
             return 0
     
     def accept_residue(self, residue):
-        # print(self.region_residue_list)
-        # raise
         if residue.get_resname() in standard_aa_names and residue in self.region_residue_list:
             # print(residue.get_resname())
             return 1
