@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../scop_classification")
 import pandas as pd
+import os
 
 class IGenerator(object):
     def __init__(self) -> None:
@@ -24,7 +25,11 @@ class IGenerator(object):
             new_df = new_df.append(df.loc[i], ignore_index=True)
             print()
             if i+1 == n_rows_to_skip+n_rows_to_evalutate: break
-        if out_file_path is not None: 
+        if out_file_path!=None: 
+            if os.path.exists(out_file_path):
+                prev_df = pd.read_csv(out_file_path)
+                new_df = prev_df.append(new_df, ignore_index=True)
+                new_df.reset_index(inplace=True)
             new_df.to_csv(out_file_path, index=False)
     
     def do_distributed(self, i, df):
