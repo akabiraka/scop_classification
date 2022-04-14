@@ -11,7 +11,10 @@ class IGenerator(object):
         raise NotImplementedError()
 
     def do_linear(self, df, n_rows_to_skip, n_rows_to_evalutate, out_file_path=None):
-        new_df = pd.DataFrame()
+        if out_file_path!=None and os.path.exists(out_file_path): 
+            new_df = pd.read_csv(out_file_path)
+        else:
+            new_df = pd.DataFrame()
         for i, row in df.iterrows():
             if i+1 <= n_rows_to_skip: continue
             pdb_id, chain_and_region = row["FA-PDBID"].lower(), row["FA-PDBREG"]
@@ -25,15 +28,13 @@ class IGenerator(object):
 
             self.do(pdb_id, chain_id, region)
             
-            new_df = new_df.append(df.loc[i], ignore_index=True)
+            if out_file_path!=None:
+                new_df = new_df.append(df.loc[i], ignore_index=True)
+                new_df.reset_index(drop=True, inplace=True)
+                new_df.to_csv(out_file_path, index=False)
+
             print()
             if i+1 == n_rows_to_skip+n_rows_to_evalutate: break
-        if out_file_path!=None: 
-            if os.path.exists(out_file_path):
-                prev_df = pd.read_csv(out_file_path)
-                new_df = prev_df.append(new_df, ignore_index=True)
-                new_df.reset_index(drop=True, inplace=True)
-            new_df.to_csv(out_file_path, index=False)
     
     def do_distributed(self, i, df):
         row = df.loc[i]
