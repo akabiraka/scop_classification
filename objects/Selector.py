@@ -105,22 +105,28 @@ class ChainAndRegionSelect(Select):
         else: 
             raise NotImplementedError()
 
-        if start.isdigit():
+        if start.startswith("-"):
+            self.start_residue_id = (" ", -int(start[1:]), " ")    
+        elif start.isdigit():
             self.start_residue_id = (" ", int(start), " ")
         else: 
             self.start_residue_id = (" ", int(start[:-1]), start[-1])
-        if end.isdigit():
+
+        if start.startswith("-"):
+            self.end_residue_id = (" ", -int(end[1:]), " ")        
+        elif end.isdigit():
             self.end_residue_id = (" ", int(end), " ")
         else: 
             self.end_residue_id = (" ", int(end[:-1]), end[-1])
-        # self.region_range = range(int(start), int(end)+1)
+        
+        # print(self.start_residue_id)
+        # print(self.end_residue_id)
+        
 
     def  accept_chain(self, chain):
         # print(chain.id, self.chain_id)
         if chain.id == self.chain_id:
             # creating region residue list
-            # print(self.start_residue_id)
-            # print(self.end_residue_id)
             flag = False
             self.region_residue_list = []
             for residue in chain.get_residues():
