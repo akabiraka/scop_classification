@@ -23,3 +23,4 @@
 * If a chain region looks like this "A:1-272,A:312-378", skip.
 * 6qwj: does not exist
 * 1ejg: Bio.PDB.PDBExceptions.PDBConstructionException: Blank altlocs in duplicate residue SER (' ', 22, ' ')
+* 3msz: does not have 93 atom at chain A.

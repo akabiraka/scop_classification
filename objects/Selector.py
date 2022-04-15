@@ -102,9 +102,12 @@ class ChainAndRegionSelect(Select):
         elif region.count("-")==2: 
             loc = region.index("-", region.index("-")+1)
             start, end = region[:loc], region[loc+1:]
-        else: 
-            raise NotImplementedError()
+        elif region.count("-")==3:
+            loc = region.index("-", region.index("-")+1)
+            start, end = region[:loc], region[loc+1:]
+            # raise NotImplementedError()
 
+        # print(start, end)
         if start.startswith("-"):
             self.start_residue_id = (" ", -int(start[1:]), " ")    
         elif start.isdigit():
@@ -112,7 +115,7 @@ class ChainAndRegionSelect(Select):
         else: 
             self.start_residue_id = (" ", int(start[:-1]), start[-1])
 
-        if start.startswith("-"):
+        if end.startswith("-"):
             self.end_residue_id = (" ", -int(end[1:]), " ")        
         elif end.isdigit():
             self.end_residue_id = (" ", int(end), " ")
