@@ -9,7 +9,7 @@
 #### Workflow
 * Separate class labels from the downloaded dataset: `python generators/data_clean.py`
 * Download PDB, clean and generate fasta: `python generators/DownloadCleanFasta.py`
-* Clean before/after download data: `python generators/data_helper.py`
+* Clean before/after download data: `python generators/data_updater.py`
 * Generate features: `python generators/Features.py`
 * Divide the data into train/val/test set as 70/15/15: `python generators/train_val_test_split.py`
 * Analyze data to setup hyperparameters: `python analyzers/data.py`
