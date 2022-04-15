@@ -32,7 +32,6 @@ class IGenerator(object):
             
             
             print(f"Row:{i+1} -> {pdb_id}:{chain_id}")
-
             self.do(pdb_id, chain_id, region)
             
             if out_file_path!=None:
@@ -50,9 +49,15 @@ class IGenerator(object):
         chain_and_region = chain_and_region.split(":")
         chain_id, region = chain_and_region[0], chain_and_region[1]
         if len(chain_id)>1: return
-        if pdb_id == "3iyo": return
-        if chain_and_region.find(",")==-1: return 
-        print(f"Row:{i} -> {pdb_id}:{chain_id}")
+        
+        # these pdbs does not exists
+        if pdb_id=="6qwj": return
+        if pdb_id=="1ejg": return
+        if pdb_id=="7v7y": return
+        if pdb_id=="3msz": return
+        if pdb_id=="6l7f": return
+        
+        print(f"Row:{i+1} -> {pdb_id}:{chain_id}")
         self.do(pdb_id, chain_id, region)
 
 # gen = IGenerator()
