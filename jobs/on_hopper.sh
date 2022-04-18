@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=8                   # Request n   cores per node
 ##SBATCH --nodes=1                          # Request N nodes
 #SBATCH --mem-per-cpu=4000MB                # Request nGB RAM per core
-##SBATCH --array=5001-10000                         # distributed array job   
+#SBATCH --array=0-10                         # distributed array job   
 
 ## gpu
 ##SBATCH --partition=gpuq                    # the DGX only belongs in the 'gpu'  partition
@@ -22,5 +22,5 @@
 
 ##nvidia-smi
 ##python generators/DownloadCleanFasta.py
-python generators/data_helper.py
-##python generators/Features.py
+##python generators/data_helper.py
+python generators/Features.py

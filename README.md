@@ -24,3 +24,4 @@
 * 6qwj: does not exist
 * 1ejg: Bio.PDB.PDBExceptions.PDBConstructionException: Blank altlocs in duplicate residue SER (' ', 22, ' ')
 * 3msz: does not have 93 atom at chain A.
+* 3IYO,D:118-459: DSSP failed, only contains CA atoms 
