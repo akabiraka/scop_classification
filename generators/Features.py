@@ -55,7 +55,7 @@ cd = Features()
 # n_rows_to_evalutate = 3#000
 # cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
 
-i = 1248 #0-based index
+i = 1 #0-based index
 if "SLURM_ARRAY_TASK_ID" in os.environ:
     i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
 cd.do_distributed(i, df, out_file_path)

@@ -24,4 +24,9 @@
 * 6qwj: does not exist
 * 1ejg: Bio.PDB.PDBExceptions.PDBConstructionException: Blank altlocs in duplicate residue SER (' ', 22, ' ')
 * 3msz: does not have 93 atom at chain A.
-* 3IYO,D:118-459: DSSP failed, only contains CA atoms 
+* DSSP failed (only contains CA atoms):
+
+#### 3rd party Softwares
+* DSSP installation: 
+    * sudo apt install dssp, or
+    * Install anaconda and then conda install -c salilab dssp 

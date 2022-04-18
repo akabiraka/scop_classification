@@ -54,6 +54,7 @@ class IGenerator(object):
                 with open(self.tracebacks_file_path, "a") as f:
                     f.write(f"{i}, {pdb_id}, {chain_id}, {region}, {str(e)}")
                     f.write(traceback.format_exc())
+            return
         
         if out_file_path!=None:
             good_df = good_df.append(df.loc[i], ignore_index=True)
