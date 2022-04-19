@@ -34,7 +34,7 @@ def split_by_having_all_classes(inp_file_path, cls_col_name="FA", train_frac=0.7
     # print(test.shape, df.shape)
     return train, val, test
 
-
+# helper function of split_by_having_all_classes
 def sample_frac_for_each_class(df, classes, cls_col_name, frac):
     new_df = pd.DataFrame(columns=df.columns)
     for cls in classes:

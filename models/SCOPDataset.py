@@ -1,6 +1,4 @@
-from asyncio import tasks
 import sys
-from numpy import dtype
 sys.path.append("../scop_classification")
 import pandas as pd
 import torch
@@ -66,10 +64,3 @@ class SCOPDataset(Dataset):
         label = F.one_hot(torch.tensor(class_id), len(self.class_dict)).to(dtype=torch.float32)
         
         return data, label
-        
-
-# scop = SCOPDataset(inp_file="data/splits/train_7.txt", n_classes=3, task="FA", max_len=512)
-# print(len(scop))
-# data, label = scop.__getitem__(5)
-# print(data["src"].shape, data["key_padding_mask"].shape, data["attn_mask"].shape, label.shape)
-# print(data["attn_mask"])

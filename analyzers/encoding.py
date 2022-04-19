@@ -14,3 +14,4 @@ for i in range(n):
     plt.scatter(np.repeat(i, dim), y[i])
     plt.legend(["dim %d"%p for p in range(4, 8)])
 plt.show()
+# plt.savefig(f"outputs/images/amino_acid_wave_encoding.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
