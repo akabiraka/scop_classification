@@ -1,4 +1,3 @@
-from operator import index
 import sys
 sys.path.append("../scop_classification")
 
@@ -15,7 +14,7 @@ def random_split(inp_file_path, train_frac=0.7, val_frac=.15):
     return train, val, test
 
 
-def split_by_having_all_classes(inp_file_path, cls_col_name="FA", train_frac=0.7, val_frac=.15):
+def split_by_having_all_classes(inp_file_path, cls_col_name="SF", train_frac=0.7, val_frac=.15):
     """todo
     train: select train_frac% for each class
     """
@@ -51,9 +50,9 @@ def sample_frac_for_each_class(df, classes, cls_col_name, frac):
         # print(new_df.shape, df.shape)
     return new_df, df
 
-inp_file_path = "data/splits/all_clean.txt"
+inp_file_path = "data/splits/cleaned_after_feature_computation.txt"
 # train, val, test = random_split(inp_file_path, train_frac=0.7, test_frac=.3)
-train, val, test = split_by_having_all_classes(inp_file_path, cls_col_name="FA", train_frac=0.7, val_frac=.15)
+train, val, test = split_by_having_all_classes(inp_file_path, cls_col_name="SF", train_frac=0.7, val_frac=.15)
 train.to_csv(f"data/splits/train_{len(train)}.txt", index=False)
 val.to_csv(f"data/splits/val_{len(val)}.txt", index=False)
 test.to_csv(f"data/splits/test_{len(test)}.txt", index=False)

@@ -25,15 +25,15 @@ class Features(IGenerator):
         cln_pdb_file = self.pdbs_clean_dir+pdb_id+chain_id+region+".pdb"
         fasta_file = self.fastas_dir+pdb_id+chain_id+region+".fasta"
         out_feature_file = self.features_dir+pdb_id+chain_id+region+".pkl"
-        out_contact_map_file = self.distance_matrices_dir+pdb_id+chain_id+region+".pkl"
+        out_dist_mat_file = self.distance_matrices_dir+pdb_id+chain_id+region+".pkl"
 
-        # contact_map feature
-        if os.path.exists(out_contact_map_file): 
-            contact_map = Utils.load_pickle(out_contact_map_file)
+        # dist_mat feature
+        if os.path.exists(out_dist_mat_file): 
+            dist_mat = Utils.load_pickle(out_dist_mat_file)
         else:
-            contact_map = self.distance_matrix.get(cln_pdb_file, chain_id, matrix_type="NN", atom_1="CA", atom_2="CA", contact_map=False)
-            Utils.save_as_pickle(contact_map, out_contact_map_file)
-        print(f"    Contact-map: {contact_map.shape}")
+            dist_mat = self.distance_matrix.get(cln_pdb_file, chain_id, matrix_type="NN", atom_1="CA", atom_2="CA", dist_mat=False)
+            Utils.save_as_pickle(dist_mat, out_dist_mat_file)
+        print(f"    Contact-map: {dist_mat.shape}")
 
         # amino acid one-hot feature
         if os.path.exists(out_feature_file):
@@ -43,8 +43,8 @@ class Features(IGenerator):
             Utils.save_as_pickle(features, out_feature_file)
         print(f"    Features: {features.shape}")
 
-        if contact_map.shape[0]!=features.shape[0]: 
-            raise Exception(f"{contact_map.shape[0]}!={features.shape[0]} does not match")
+        if dist_mat.shape[0]!=features.shape[0]: 
+            raise Exception(f"{dist_mat.shape[0]}!={features.shape[0]} does not match")
 
 inp_file_path = "data/splits/cleaned_after_pdbs_downloaded.txt"
 out_file_path = "data/splits/cleaned_after_feature_computation.txt"

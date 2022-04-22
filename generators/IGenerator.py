@@ -9,7 +9,7 @@ class IGenerator(object):
         self.dssp_failed_cases = "data/splits/dssp_failed_cases.txt"
         self.tracebacks_file_path = "data/splits/tracebacks.txt"
 
-    def do(self, pdb_id, chain_id):
+    def do(self, pdb_id, chain_id, region):
         raise NotImplementedError()
 
     def do_linear(self, df, n_rows_to_skip, n_rows_to_evalutate, out_file_path=None):

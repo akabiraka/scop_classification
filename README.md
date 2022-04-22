@@ -7,11 +7,38 @@
 
 
 #### Workflow
-* Separate class labels from the downloaded dataset: `python generators/data_clean.py`
+* Separate class labels from the downloaded dataset: `python generators/separate_class_labels.py`
+    * Input file: `data/splits/scop-cla-latest.txt`
+    * Output file: `data/splits/cleaned_after_separating_class_labels.txt`
 * Download PDB, clean and generate fasta: `python generators/DownloadCleanFasta.py`
-* Clean before/after download data: `python generators/data_updater.py`
+    * Input file: `data/splits/cleaned_after_separating_class_labels.txt`
+    * Output file: `data/splits/cleaned_after_pdbs_downloaded.txt`
+* Update sequence length: `python generators/update_seq_length.py`
+    * Input/Output file: `data/splits/cleaned_after_pdbs_downloaded.txt`
 * Generate features: `python generators/Features.py`
-* Divide the data into train/val/test set as 70/15/15: `python generators/train_val_test_split.py`
+    * Input file: `data/splits/cleaned_after_pdbs_downloaded.txt`
+    * Output file: `data/splits/cleaned_after_feature_computation.txt`
+* Copy: `data/splits/cleaned_after_feature_computation.txt` to `data/splits/all_cleaned.txt`
+* Check feature correctness: `python generators/check_feature_correctness.py`
+    * Input file: `data/splits/all_cleaned.txt`
+* Divide the cleaned data into train/val/test set as 70/15/15: `python generators/train_val_test_split.py`
+    * Input file: `data/splits/all_cleaned.txt`
+    * Output file:
+        * `data/splits/train_{len(train)}.txt`
+        * `data/splits/val_{len(val)}.txt`
+        * `data/splits/test_{len(test)}.txt`
+* Exclude classes that has less than n (default 10) data points.
+    * Input file: `data/splits/all_cleaned.txt`
+    * Output file: 
+        * `data/splits/excluding_classes_having_less_than_n_datam.txt`
+        * `data/splits/only_excluded_classes_having_less_than_n_datam.txt`
+* Copy: `data/splits/excluding_classes_having_less_than_n_datam.txt` to `data/splits/all_cleaned_excluded.txt`
+* Divide the excluded data into train/val/test set as 70/15/15: `python generators/train_val_test_split.py`
+    * Input file: `data/splits/all_cleaned_excluded.txt`
+    * Output file:
+        * `data/splits/train_{len(train)}.txt`
+        * `data/splits/val_{len(val)}.txt`
+        * `data/splits/test_{len(test)}.txt`
 * Analyze data to setup hyperparameters: `python analyzers/data.py`
 * Train and test the model: `python models/train_test.py`
 

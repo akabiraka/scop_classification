@@ -27,16 +27,17 @@ class DownloadCleanFasta(IGenerator):
         self.pdbdata.generate_fasta_from_pdb(pdb_id, chain_id, input_pdb_filepath=cln_pdb_file, out_fasta_file=fasta_file)
 
 
-inp_file_path = "data/splits/all.txt"
-out_file_path = "data/splits/all_clean.txt"
-n_rows_to_skip = 34656
-n_rows_to_evalutate = 1
+inp_file_path = "data/splits/cleaned_after_separating_class_labels.txt"
+out_file_path = "data/splits/cleaned_after_pdbs_downloaded.txt"
+
 df = pd.read_csv(inp_file_path)
-
-i = 11 #0-based index
-if "SLURM_ARRAY_TASK_ID" in os.environ:
-    i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
-
 dcf = DownloadCleanFasta()
-dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
+
+# i = 11 #0-based index
+# if "SLURM_ARRAY_TASK_ID" in os.environ:
+#     i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
 # dcf.do_distributed(i, df)
+
+n_rows_to_skip = 0
+n_rows_to_evalutate = 35000
+dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
