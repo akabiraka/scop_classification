@@ -9,7 +9,7 @@
 #SBATCH --partition=normal                  # submit   to the normal(default) partition
 #SBATCH --cpus-per-task=8                   # Request n   cores per node
 ##SBATCH --nodes=1                          # Request N nodes
-#SBATCH --mem-per-cpu=4000MB                # Request nGB RAM per core
+#SBATCH --mem-per-cpu=16000MB                # Request nGB RAM per core
 #SBATCH --array=0-10                         # distributed array job   
 
 ## gpu
