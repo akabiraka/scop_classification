@@ -25,8 +25,8 @@ class IGenerator(object):
         good_df, bad_df = pd.DataFrame(), pd.DataFrame()
         if out_file_path!=None and os.path.exists(out_file_path): 
             good_df = pd.read_csv(out_file_path)
-        if os.path.exists(self.bad_file_path): 
-            bad_df = pd.read_csv(self.bad_file_path)
+        if os.path.exists(self.dssp_failed_cases): 
+            bad_df = pd.read_csv(self.dssp_failed_cases)
             
         row = df.loc[i]
         pdb_id, chain_and_region = row["FA-PDBID"].lower(), row["FA-PDBREG"]
