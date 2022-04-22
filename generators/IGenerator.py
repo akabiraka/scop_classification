@@ -6,7 +6,7 @@ import traceback
 
 class IGenerator(object):
     def __init__(self) -> None:
-        self.bad_file_path = "data/splits/bad_data.txt"
+        self.dssp_failed_cases = "data/splits/dssp_failed_cases.txt"
         self.tracebacks_file_path = "data/splits/tracebacks.txt"
 
     def do(self, pdb_id, chain_id):
@@ -49,7 +49,7 @@ class IGenerator(object):
             if "DSSP failed" in str(e):
                 bad_df = bad_df.append(df.loc[i], ignore_index=True)
                 bad_df.reset_index(drop=True, inplace=True)
-                bad_df.to_csv(self.bad_file_path, index=False)
+                bad_df.to_csv(self.dssp_failed_cases, index=False)
             else:
                 with open(self.tracebacks_file_path, "a") as f:
                     f.write(f"{i}, {pdb_id}, {chain_id}, {region}, {str(e)}")

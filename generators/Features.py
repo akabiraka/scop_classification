@@ -15,7 +15,7 @@ class Features(IGenerator):
         self.pdbs_clean_dir = "data/pdbs_clean/"
         self.fastas_dir = "data/fastas/"
         self.features_dir = "data/features/"
-        self.contact_maps_dir = "data/contact_maps/"
+        self.distance_matrices_dir = "data/distance_matrices/"
         self.distance_matrix = DistanceMatrix()
         self.protein_descriptor = ProteinDescriptor()
         
@@ -25,14 +25,14 @@ class Features(IGenerator):
         cln_pdb_file = self.pdbs_clean_dir+pdb_id+chain_id+region+".pdb"
         fasta_file = self.fastas_dir+pdb_id+chain_id+region+".fasta"
         out_feature_file = self.features_dir+pdb_id+chain_id+region+".pkl"
-        out_contact_map_file = self.contact_maps_dir+pdb_id+chain_id+region+".pkl"
+        out_contact_map_file = self.distance_matrices_dir+pdb_id+chain_id+region+".pkl"
 
         # contact_map feature
-        # if os.path.exists(out_contact_map_file): 
-        #     contact_map = Utils.load_pickle(out_contact_map_file)
-        # else:
-        contact_map = self.distance_matrix.get(cln_pdb_file, chain_id, matrix_type="NN", atom_1="CA", atom_2="CA", contact_map=False)
-        Utils.save_as_pickle(contact_map, out_contact_map_file)
+        if os.path.exists(out_contact_map_file): 
+            contact_map = Utils.load_pickle(out_contact_map_file)
+        else:
+            contact_map = self.distance_matrix.get(cln_pdb_file, chain_id, matrix_type="NN", atom_1="CA", atom_2="CA", contact_map=False)
+            Utils.save_as_pickle(contact_map, out_contact_map_file)
         print(f"    Contact-map: {contact_map.shape}")
 
         # amino acid one-hot feature
