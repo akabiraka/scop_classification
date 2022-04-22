@@ -37,7 +37,7 @@ def plot_class_distribution(df, class_label="SF"):
     plt.savefig(f"outputs/images/{class_label}_distribution.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
 
 
-inp_file_path = "data/splits/all_clean.txt"
+inp_file_path = "data/splits/all_cleaned.txt"
 df = pd.read_csv(inp_file_path)
-# print_class_distribution(df)
+print_class_distribution(df)
 plot_class_distribution(df, class_label="SF")

@@ -12,23 +12,23 @@ from models.SCOPDataset import SCOPDataset
 
 
 # hyperparameters
-task="FA"
-max_len = 512
+task="SF"
+max_len = 1024
 dim_embed = 50
 n_attn_heads = 10 #dim_embed must be divisible by num_head
 dim_ff = 2*dim_embed
 n_encoder_layers=6
 dropout=0.3
-init_lr = 0.01
+init_lr = 0.001
 start_epoch = 1
 n_epochs = 300
-batch_size = 30
-device = "cpu"#"cuda" if torch.cuda.is_available() else "cpu"
+batch_size = 50
+device = "cuda" if torch.cuda.is_available() else "cpu"
 out_filename = f"ContextTransformer_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
 print(out_filename)
 
 # generating class dictionary
-df = pd.read_csv("data/splits/all_10_clean.txt")
+df = pd.read_csv("data/splits/all_cleaned.txt")
 x = df[task].unique().tolist()
 class_dict = {j:i for i,j in enumerate(x)}
 n_classes = len(class_dict)
@@ -41,9 +41,9 @@ criterion = torch.nn.CrossEntropyLoss()
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")
 
 # datasets
-train_dataset = SCOPDataset("data/splits/train_7.txt", class_dict, n_attn_heads, task, max_len)
-val_dataset = SCOPDataset("data/splits/val_1.txt", class_dict, n_attn_heads, task, max_len)
-test_dataset = SCOPDataset("data/splits/test_2.txt", class_dict, n_attn_heads, task, max_len)
+train_dataset = SCOPDataset("data/splits/train_24538.txt", class_dict, n_attn_heads, task, max_len)
+val_dataset = SCOPDataset("data/splits/val_4458.txt", class_dict, n_attn_heads, task, max_len)
+test_dataset = SCOPDataset("data/splits/test_5862.txt", class_dict, n_attn_heads, task, max_len)
 # dataloader
 train_loader = DataLoader(train_dataset, batch_size, shuffle=False)
 val_loader = DataLoader(val_dataset, batch_size, shuffle=False)

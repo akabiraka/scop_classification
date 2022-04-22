@@ -24,9 +24,9 @@
 * Divide the cleaned data into train/val/test set as 70/15/15: `python generators/train_val_test_split.py`
     * Input file: `data/splits/all_cleaned.txt`
     * Output file:
-        * `data/splits/train_{len(train)}.txt`
-        * `data/splits/val_{len(val)}.txt`
-        * `data/splits/test_{len(test)}.txt`
+        * `data/splits/train_24538.txt`: (24538, 17)
+        * `data/splits/val_4458.txt`: (4458, 17)
+        * `data/splits/test_5862.txt`: (5862, 17)
 * Exclude classes that has less than n (default 10) data points.
     * Input file: `data/splits/all_cleaned.txt`
     * Output file: 
@@ -36,9 +36,9 @@
 * Divide the excluded data into train/val/test set as 70/15/15: `python generators/train_val_test_split.py`
     * Input file: `data/splits/all_cleaned_excluded.txt`
     * Output file:
-        * `data/splits/train_{len(train)}.txt`
-        * `data/splits/val_{len(val)}.txt`
-        * `data/splits/test_{len(test)}.txt`
+        * `data/splits/train_19828.txt`: (19828, 18)  
+        * `data/splits/val_4106.txt`: (4106, 18)
+        * `data/splits/test_4410.txt`: (4410, 18)
 * Analyze data to setup hyperparameters: `python analyzers/data.py`
 * Train and test the model: `python models/train_test.py`
 
