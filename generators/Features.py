@@ -31,7 +31,7 @@ class Features(IGenerator):
         if os.path.exists(out_dist_mat_file): 
             dist_mat = Utils.load_pickle(out_dist_mat_file)
         else:
-            dist_mat = self.distance_matrix.get(cln_pdb_file, chain_id, matrix_type="NN", atom_1="CA", atom_2="CA", dist_mat=False)
+            dist_mat = self.distance_matrix.get(cln_pdb_file, chain_id, matrix_type="NN", atom_1="CA", atom_2="CA", contact_map=False)
             Utils.save_as_pickle(dist_mat, out_dist_mat_file)
         print(f"    Contact-map: {dist_mat.shape}")
 

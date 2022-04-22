@@ -33,11 +33,12 @@ def plot_class_distribution(df, class_label="SF"):
     x = df[class_label].value_counts()
     rects = plt.bar(range(1, len(x)+1), x)
     # set_height_as_bar_label(rects, plt)
-    # plt.show()
-    plt.savefig(f"outputs/images/{class_label}_distribution.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
+    plt.show()
+    # plt.savefig(f"outputs/images/{class_label}_distribution.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
 
 
 inp_file_path = "data/splits/all_cleaned.txt"
-df = pd.read_csv(inp_file_path)
+class_label="SF"
+df = pd.read_csv(inp_file_path, dtype={class_label: object})
 print_class_distribution(df)
-plot_class_distribution(df, class_label="SF")
+plot_class_distribution(df, class_label)

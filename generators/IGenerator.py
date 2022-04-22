@@ -1,4 +1,5 @@
 import sys
+from numpy import dtype
 sys.path.append("../scop_classification")
 import pandas as pd
 import os
@@ -22,7 +23,7 @@ class IGenerator(object):
             if i+1 >= n_rows_to_skip+n_rows_to_evalutate: break
     
     def do_distributed(self, i, df, out_file_path=None):
-        good_df, bad_df = pd.DataFrame(), pd.DataFrame()
+        good_df, bad_df = pd.DataFrame(columns=df.columns, dtype=object), pd.DataFrame(columns=df.columns, dtype=object)
         if out_file_path!=None and os.path.exists(out_file_path): 
             good_df = pd.read_csv(out_file_path)
         if os.path.exists(self.dssp_failed_cases): 

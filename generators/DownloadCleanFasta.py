@@ -23,8 +23,8 @@ class DownloadCleanFasta(IGenerator):
         
         # download, clean and fasta generation
         self.pdbdata.download_structure(pdb_id)
-        self.pdbdata.clean(pdb_file, cln_pdb_file, selector=ChainAndRegionSelect(chain_id, region))
-        self.pdbdata.generate_fasta_from_pdb(pdb_id, chain_id, input_pdb_filepath=cln_pdb_file, out_fasta_file=fasta_file)
+        if not os.path.exists(cln_pdb_file): self.pdbdata.clean(pdb_file, cln_pdb_file, selector=ChainAndRegionSelect(chain_id, region))
+        if not os.path.exists(fasta_file): self.pdbdata.generate_fasta_from_pdb(pdb_id, chain_id, cln_pdb_file, fasta_file)
 
 
 inp_file_path = "data/splits/cleaned_after_separating_class_labels.txt"

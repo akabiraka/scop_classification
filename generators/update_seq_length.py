@@ -11,7 +11,7 @@ def update_seq_length(inp_file):
         fasta_file = "data/fastas/"+pdb_id+chain_id+region+".fasta"
         seq_record = next(SeqIO.parse(fasta_file, "fasta"))
         # print(seq_record)
-        df.loc[i, "len"] = int(len(seq_record.seq))
+        df.loc[i, "len"] = str(len(seq_record.seq))
         # break
     df.to_csv(inp_file, index=False)
 

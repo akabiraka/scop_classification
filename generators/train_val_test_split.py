@@ -50,7 +50,7 @@ def sample_frac_for_each_class(df, classes, cls_col_name, frac):
         # print(new_df.shape, df.shape)
     return new_df, df
 
-inp_file_path = "data/splits/all_cleaned_excluded.txt"
+inp_file_path = "data/splits/all_cleaned.txt"
 # train, val, test = random_split(inp_file_path, train_frac=0.7, test_frac=.3)
 train, val, test = split_by_having_all_classes(inp_file_path, cls_col_name="SF", train_frac=0.7, val_frac=.15)
 train.to_csv(f"data/splits/train_{len(train)}.txt", index=False)
