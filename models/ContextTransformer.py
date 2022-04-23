@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import copy
 import numpy as np
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 class PositionwiseFeedForward(nn.Module):
     "Implements FFN equation."
@@ -168,7 +168,7 @@ def train(model, optimizer, criterion, train_loader, device):
         attn_mask = torch.cat([i for i in attn_mask])
         # print(x.shape, key_padding_mask.shape, attn_mask.shape)
         y_pred = model(x, key_padding_mask, attn_mask)
-        loss = criterion(y_pred, y_true)
+        loss = criterion(y_pred, y_true.to(device))
         loss.backward()
         optimizer.step()
         losses.append(loss.item())
@@ -179,26 +179,27 @@ def train(model, optimizer, criterion, train_loader, device):
 
 def test(model, criterion, loader, device):
     model.eval()
-    loss_list, ap_list, auc_list = [], [], []
+    loss_list, acc_list, precision_list, recall_list = [], [], [], []
     for data, y_true in loader:
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         y_pred = model(x, key_padding_mask, attn_mask)
-        loss = criterion(y_pred, y_true)
+        loss = criterion(y_pred, y_true.to(device))
         loss_list.append(loss.item())
 
-        # y_true = y_true.detach().numpy()
-        # y_pred = y_pred.detach().numpy()
-        # y_true, y_pred = np.argmax(y_true, axis=1), np.argmax(y_pred, axis=1)
+        
+        y_true = y_true.cpu().detach().numpy()
+        y_pred = y_pred.cpu().detach().numpy()
+        y_true, y_pred = np.argmax(y_true, axis=1), np.argmax(y_pred, axis=1)
         # print(y_true, y_pred)
 
         
         
-        # AP = average_precision_score(y_true, y_pred)
-        # ap_list.append(AP)
-        # AUC = roc_auc_score(y_true, y_pred) 
-        # auc_list.append(AUC)
-    return np.mean(loss_list)#, np.mean(ap_list), np.mean(auc_list), 
+        acc_list.append(accuracy_score(y_true, y_pred))
+        precision_list.append(precision_score(y_true, y_pred))
+        recall_list.append(recall_score(y_true, y_pred))
+        
+    return np.mean(loss_list), np.mean(acc_list), np.mean(precision_list), np.mean(precision_list)
 
 
 # if __name__ == "__main__":

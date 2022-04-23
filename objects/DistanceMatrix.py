@@ -75,7 +75,7 @@ class DistanceMatrix(object):
         return dist_matrix 
 
 
-    def get(self, cln_pdb_file, chain_id, matrix_type="NN", atom_1="CB", atom_2="CB", contact_map=False):
+    def get(self, cln_pdb_file, chain_id, matrix_type="NN", atom_1="CB", atom_2="CB"):
         """Returns distance matrix among all residues.
 
         Args:
@@ -99,7 +99,8 @@ class DistanceMatrix(object):
         else:
             dist_matrix = self.compute_nn_distance_matrix(list_residues, list_residues, atom_1, atom_2)
         
-        if contact_map: return np.where(dist_matrix<8.0, 1, 0)
+        # if contact_map: return np.where(dist_matrix<8.0, 1, 0)
+        # print(dist_matrix)
         return dist_matrix
     
 

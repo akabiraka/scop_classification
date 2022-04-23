@@ -2,12 +2,13 @@ import sys
 sys.path.append("../scop_classification")
 import pandas as pd
 import torch
+import numpy as np
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 import utils as Utils
 
 class SCOPDataset(Dataset):
-    def __init__(self, inp_file, class_dict, n_attn_heads, task="SF", max_len=1024) -> None:
+    def __init__(self, inp_file, class_dict, n_attn_heads, task="SF", max_len=1024, attn_type="contactmap") -> None:
         """Creates SCOP dataset.
         Args:
             inp_file (str): train/val/test file path
@@ -21,6 +22,7 @@ class SCOPDataset(Dataset):
         self.task = task
         self.max_len = max_len
         self.n_attn_heads = n_attn_heads
+        self.attn_type = attn_type #contactmap, nobackbone, longrange
 
 
     def __len__(self):
@@ -51,12 +53,17 @@ class SCOPDataset(Dataset):
         chain_id, region = chain_and_region[0], chain_and_region[1]
 
         feature = Utils.load_pickle("data/features/"+pdb_id+chain_id+region+".pkl")
-        contact_map = Utils.load_pickle("data/contact_maps/"+pdb_id+chain_id+region+".pkl")
+        dist_matrix = Utils.load_pickle("data/distance_matrices/"+pdb_id+chain_id+region+".pkl")
+        
 
-        # getting src and key_padding_mask
+        # computing src and key_padding_mask
+        feature = feature[:, -20:] #taking only 1-hot feature
         data = self.padd(torch.tensor(feature, dtype=torch.float32))
         
-        # getting attention mask
+        # computing attention mask
+        if self.attn_type=="nobackbone": raise NotImplementedError("nobackbone attention map has not implemented yet.")
+        elif self.attn_type=="longrange": raise NotImplementedError("longrange attention map has not implemented yet.")
+        else: contact_map = np.where(dist_matrix<8.0, 1, 0)
         data["attn_mask"] = self.get_attn_mask(contact_map)
 
         # making ground-truth class tensor

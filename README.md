@@ -4,6 +4,16 @@
 * SCOP data: [URL](https://scop.mrc-lmb.cam.ac.uk/files/scop-cla-latest.txt)
 
 #### Model hyperparameters
+    * task="SF"
+    * max_len=1024           # maximum length of which the dataset generation process will padd/truncate
+    * dim_embed=20           # dim_embed must be divisible by num_head
+    * n_attn_heads=10        # number of attention heads
+    * dim_ff=2*dim_embed     # feed forward network dimension is set as 2*dim_embed
+    * n_encoder_layers=6
+    * dropout=0.3
+    * init_lr=0.001
+    * n_epochs=300
+    * batch_size=50
 
 
 #### Workflow
@@ -42,6 +52,11 @@
         * `data/splits/test_4410.txt`: (4410, 18)
 * Analyze data to setup hyperparameters: `python analyzers/data.py`
 * Train and test the model: `python models/train_test.py`
+
+#### Analyze
+* To analize data: `python analyzers/data.py`
+* To analize single datam when generating dataset: `python analyzers/dataset.py`
+* To vizualize the training progress: `tensorboard --logdir=outputs/tensorboard_runs/`
 
 #### Data issues and resolution
 * If len(chain_id)>1: removed
