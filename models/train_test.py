@@ -13,15 +13,15 @@ from models.SCOPDataset import SCOPDataset
 
 # hyperparameters
 task="SF"
-max_len=256
+max_len=1024
 dim_embed=20
 n_attn_heads=10 # dim_embed must be divisible by num_head
-dim_ff=2*dim_embed
+dim_ff=8*dim_embed
 n_encoder_layers=6
 dropout=0.3
 init_lr=0.001
-n_epochs=5
-batch_size=5
+n_epochs=300
+batch_size=50
 start_epoch=1
 device = "cuda" if torch.cuda.is_available() else "cpu"
 out_filename = f"ContextTransformer_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
@@ -29,8 +29,8 @@ print(out_filename)
 
 
 all_data_file_path="data/splits/all_cleaned.txt"
-train_data_file_path="data/splits/train_70.txt"
-val_data_file_path="data/splits/val_14.txt"
+train_data_file_path="data/splits/train_24538.txt"
+val_data_file_path="data/splits/val_4458.txt"
 
 # generating class dictionary
 df = pd.read_csv(all_data_file_path)
