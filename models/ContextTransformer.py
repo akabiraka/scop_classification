@@ -159,7 +159,7 @@ def train(model, optimizer, criterion, train_loader, device):
     for data, y_true in train_loader:
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
-        print(x.shape, key_padding_mask.shape, attn_mask.shape)
+        #print(x.shape, key_padding_mask.shape, attn_mask.shape)
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss.backward()

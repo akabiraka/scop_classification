@@ -41,7 +41,7 @@ n_classes = len(class_dict)
 # model, optimizer, scheduler, criterion, summarywriter
 model = ContextTransformer.build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
 model.to(device)
-print(model)
+#print(model)
 optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
 criterion = torch.nn.CrossEntropyLoss()
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")
