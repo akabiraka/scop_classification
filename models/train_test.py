@@ -24,7 +24,7 @@ n_epochs=300
 batch_size=50
 start_epoch=1
 device = "cuda" if torch.cuda.is_available() else "cpu"
-out_filename = f"ContextTransformer_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
+out_filename = f"FullContactMapOnehot_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
 print(out_filename)
 
 
