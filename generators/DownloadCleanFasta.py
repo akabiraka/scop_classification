@@ -39,5 +39,5 @@ dcf = DownloadCleanFasta()
 # dcf.do_distributed(i, df)
 
 n_rows_to_skip = 0
-n_rows_to_evalutate = 35000
+n_rows_to_evalutate = 40000
 dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
