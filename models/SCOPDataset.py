@@ -35,19 +35,18 @@ class SCOPDataset(Dataset):
         x = x[:self.max_len] #truncate to max_len
         src = torch.cat([x, torch.zeros([self.max_len-x.shape[0], x.shape[1]])]) # padding 0's at the end
         padding_mask = torch.cat([torch.zeros([x.shape[0]]), torch.ones([self.max_len-x.shape[0]])]) # non-zero values indicates ignore
-        out = {"src": src,
+        out = {"src": src.to(dtype=torch.int32),
                "key_padding_mask": padding_mask.to(dtype=torch.bool)}
         return out
 
     def get_attn_mask(self, contact_map):
-        contact_map = torch.rand([230, 230])
         contact_map = contact_map[:self.max_len, :self.max_len] #truncate to max_len
-        print(contact_map.shape)
+        # print(contact_map.shape)
         attn_mask = torch.ones([self.max_len, self.max_len]) #necessary padding
         attn_mask[:contact_map.shape[0], :contact_map.shape[1]] = torch.tensor(contact_map)
         attn_mask = torch.logical_not(attn_mask.to(dtype=torch.bool))
         attn_mask = attn_mask.repeat(self.n_attn_heads, 1, 1)
-        print(attn_mask.shape)
+        # print(attn_mask.shape)
         return attn_mask
 
 
@@ -59,10 +58,16 @@ class SCOPDataset(Dataset):
         feature = Utils.load_pickle("data/features/"+pdb_id+chain_id+region+".pkl")
         dist_matrix = Utils.load_pickle("data/distance_matrices/"+pdb_id+chain_id+region+".pkl")
         
+        # features that will be used in the model
+        feature = torch.tensor(feature[:, -20:]) #taking only 1-hot feature
+        
+        #int amino-acid encoding [1, 20]
+        feature = torch.argmax(feature, dim=1)+1 
+        feature.unsqueeze_(1)
 
         # computing src and key_padding_mask
-        feature = feature[:, -20:] #taking only 1-hot feature
-        data = self.padd(torch.tensor(feature, dtype=torch.float32))
+        data = self.padd(feature)
+        data["src"].squeeze_(1)
         
         # computing attention mask
         if self.attn_type=="nobackbone": raise NotImplementedError("nobackbone attention map has not implemented yet.")
