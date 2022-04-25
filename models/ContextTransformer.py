@@ -179,7 +179,7 @@ def train(model, optimizer, criterion, train_loader, device):
 
 def test(model, criterion, loader, device):
     model.eval()
-    loss_list, acc_list, precision_list, recall_list = [], [], [], []
+    loss_list, acc_list = [], []
     for data, y_true in loader:
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
@@ -196,10 +196,8 @@ def test(model, criterion, loader, device):
         
         
         acc_list.append(accuracy_score(y_true, y_pred))
-        precision_list.append(precision_score(y_true, y_pred))
-        recall_list.append(recall_score(y_true, y_pred))
         
-    return np.mean(loss_list), np.mean(acc_list), np.mean(precision_list), np.mean(precision_list)
+    return np.mean(loss_list), np.mean(acc_list)
 
 
 # if __name__ == "__main__":

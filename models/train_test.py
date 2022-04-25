@@ -70,14 +70,12 @@ if os.path.exists(f"outputs/models/{out_filename}.pth"):
 best_loss = np.inf
 for epoch in range(start_epoch, n_epochs+start_epoch):
     train_loss = ContextTransformer.train(model, optimizer, criterion, train_loader, device)
-    val_loss, avg_acc, avg_precision, avg_recall = ContextTransformer.test(model, criterion, val_loader, device)
+    val_loss, avg_acc = ContextTransformer.test(model, criterion, val_loader, device)
     crnt_lr = optimizer.param_groups[0]["lr"]
-    print(f"Epoch: {epoch:03d}, crnt_lr: {crnt_lr:.5f}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, avg_acc: {avg_acc:.2f}, avg_precision: {avg_precision:.2f}, avg_recall: {avg_recall:.2f}")
+    print(f"Epoch: {epoch:03d}, crnt_lr: {crnt_lr:.5f}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, avg_acc: {avg_acc:.2f}")
     writer.add_scalar('train loss',train_loss,epoch)
     writer.add_scalar('val loss',val_loss,epoch)
     writer.add_scalar('avg_acc',avg_acc,epoch)
-    writer.add_scalar('avg_precision',avg_precision,epoch)
-    writer.add_scalar('avg_recall',avg_recall,epoch)
     writer.add_scalar('crnt_lr',crnt_lr,epoch)
 
     # save model dict

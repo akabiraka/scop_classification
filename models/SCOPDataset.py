@@ -40,10 +40,14 @@ class SCOPDataset(Dataset):
         return out
 
     def get_attn_mask(self, contact_map):
-        attn_mask = torch.ones([self.max_len, self.max_len])
+        contact_map = torch.rand([230, 230])
+        contact_map = contact_map[:self.max_len, :self.max_len] #truncate to max_len
+        print(contact_map.shape)
+        attn_mask = torch.ones([self.max_len, self.max_len]) #necessary padding
         attn_mask[:contact_map.shape[0], :contact_map.shape[1]] = torch.tensor(contact_map)
         attn_mask = torch.logical_not(attn_mask.to(dtype=torch.bool))
         attn_mask = attn_mask.repeat(self.n_attn_heads, 1, 1)
+        print(attn_mask.shape)
         return attn_mask
 
 
