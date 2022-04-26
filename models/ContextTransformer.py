@@ -190,8 +190,8 @@ def test(model, criterion, loader, device):
             losses.append(loss.item())
             print(f"    test batch: {i}, loss: {loss.item()}")
             
-            acc = compute_accuracy(y_true, y_pred)
-            print(f"                     acc: {acc}")
+            # acc = compute_accuracy(y_true, y_pred)
+            # print(f"                     acc: {acc}")
 
     return np.mean(losses)
 
