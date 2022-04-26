@@ -23,8 +23,9 @@ init_lr=0.001
 n_epochs=300 #300
 batch_size=50 #50
 start_epoch=1
+attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu"
-out_filename = f"FullContactMapWithEmbedding_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
+out_filename = f"Embedding_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}"
 print(out_filename)
 
 
@@ -41,14 +42,14 @@ n_classes = len(class_dict)
 # model, optimizer, scheduler, criterion, summarywriter
 model = ContextTransformer.build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
 model.to(device)
-print(model)
+# print(model)
 optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
 criterion = torch.nn.CrossEntropyLoss()
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")
 
 # dataset and dataloader
-train_dataset = SCOPDataset(train_data_file_path, class_dict, n_attn_heads, task, max_len)
-val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len)
+train_dataset = SCOPDataset(train_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
+val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 train_loader = DataLoader(train_dataset, batch_size, shuffle=False)
 val_loader = DataLoader(val_dataset, batch_size, shuffle=False)
 print(f"train batches: {len(train_loader)}, val batches: {len(val_loader)}")

@@ -1,13 +1,12 @@
 import sys
-from turtle import forward
 sys.path.append("../scop_classification")
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import copy
 import numpy as np
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-CUDA_LAUNCH_BLOCKING=1
+from sklearn.metrics import accuracy_score
+# CUDA_LAUNCH_BLOCKING=1
 
 class PositionwiseFeedForward(nn.Module):
     "Implements FFN equation."
@@ -49,7 +48,7 @@ class EncoderLayer(nn.Module):
         self.dim_embed = dim_embed
 
     def forward(self, x, key_padding_mask, attn_mask):
-        attn_output, _ = self.attention(x.clone(), x.clone(), x.clone(), key_padding_mask, attn_mask=attn_mask)
+        attn_output, _ = self.attention(x, x, x, key_padding_mask, attn_mask=attn_mask)
         x = self.sublayer[0](x, lambda x: attn_output)
         return self.sublayer[1](x, self.feed_forward)
 
@@ -156,7 +155,7 @@ def padd(input:list, max_len:int):
 def train(model, optimizer, criterion, train_loader, device):
     model.train()
     losses = []
-    for data, y_true in train_loader:
+    for i, data, y_true in enumerate(train_loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         print(x.shape, key_padding_mask.shape, attn_mask.shape)
@@ -165,7 +164,7 @@ def train(model, optimizer, criterion, train_loader, device):
         loss.backward()
         optimizer.step()
         losses.append(loss.item())
-        print(f"    loss: {loss.item()}")
+        print(f"    train batch: {i}, loss: {loss.item()}")
         # break
     return np.mean(losses)
 
@@ -173,13 +172,13 @@ def train(model, optimizer, criterion, train_loader, device):
 def test(model, criterion, loader, device):
     model.eval()
     loss_list, acc_list = [], []
-    for data, y_true in loader:
+    for i, data, y_true in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss_list.append(loss.item())
-
+        print(f"    test batch: {i}, loss: {loss.item()}")
         
         y_true = y_true.cpu().detach().numpy()
         y_pred = y_pred.cpu().detach().numpy()
