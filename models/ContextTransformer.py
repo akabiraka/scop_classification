@@ -156,9 +156,7 @@ def compute_accuracy(y_true, y_pred):
     y_pred = y_pred.cpu().detach().numpy()
     y_true, y_pred = np.argmax(y_true, axis=1), np.argmax(y_pred, axis=1)
     # print(y_true, y_pred)
-
     acc = accuracy_score(y_true, y_pred)
-    print(f"                     acc: {acc}")
     return acc
 
 def train(model, optimizer, criterion, train_loader, device):
@@ -174,14 +172,13 @@ def train(model, optimizer, criterion, train_loader, device):
         optimizer.step()
         losses.append(loss.item())
         print(f"    train batch: {i}, loss: {loss.item()}")
-        acc = compute_accuracy(y_true, y_pred)
         # break
     return np.mean(losses)
 
 
 def test(model, criterion, loader, device):
     model.eval()
-    loss_list, acc_list = [], []
+    loss_list = []
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
@@ -191,9 +188,9 @@ def test(model, criterion, loader, device):
         print(f"    test batch: {i}, loss: {loss.item()}")
         
         acc = compute_accuracy(y_true, y_pred)
-        acc_list.append(acc)
-        
-    return np.mean(loss_list), np.mean(acc_list)
+        print(f"                     acc: {acc}")
+
+    return np.mean(loss_list)
 
 
 # if __name__ == "__main__":
