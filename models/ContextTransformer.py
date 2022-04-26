@@ -1,4 +1,5 @@
 import sys
+from turtle import forward
 sys.path.append("../scop_classification")
 import torch
 import torch.nn as nn
@@ -6,6 +7,7 @@ import torch.nn.functional as F
 import copy
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score
+CUDA_LAUNCH_BLOCKING=1
 
 class PositionwiseFeedForward(nn.Module):
     "Implements FFN equation."
@@ -47,7 +49,7 @@ class EncoderLayer(nn.Module):
         self.dim_embed = dim_embed
 
     def forward(self, x, key_padding_mask, attn_mask):
-        attn_output, _ = self.attention(x, x, x, key_padding_mask, attn_mask=attn_mask)
+        attn_output, _ = self.attention(x.clone(), x.clone(), x.clone(), key_padding_mask, attn_mask=attn_mask)
         x = self.sublayer[0](x, lambda x: attn_output)
         return self.sublayer[1](x, self.feed_forward)
 
@@ -107,26 +109,16 @@ class EncoderDecoder(nn.Module):
         x = self.decoder(x)
         return x
 
-# class BuildModel(nn.Module):
-#     def __init__(self, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2):
-#         super(BuildModel, self).__init__()
-#         cp = copy.deepcopy
-#         attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=True)
-#         ff = PositionwiseFeedForward(dim_embed, dim_ff, dropout)
-#         self.encoder = Encoder(EncoderLayer(dim_embed, attn, ff, dropout), n_encoder_layers)
-#         self.classifier = Classification(dim_embed, n_classes, dropout)
-#         self.dim_embed = dim_embed
-#         self.dim_ff = dim_ff
-#         self.n_attn_heads = n_attn_heads
-#         self.n_encoder_layers = n_encoder_layers
-#         self.n_classes = n_classes
-#         self.dropout = dropout
-
-#     def forward(self, x, key_padding_mask, attn_mask):
-#         x = self.encoder(x, key_padding_mask, attn_mask)
-#         x = self.classifier(x)
-#         return x
-
+class EncoderDecoderWithEmbedding(nn.Module):
+    def __init__(self, dim_embed, encoder_decoder):
+        super(EncoderDecoderWithEmbedding, self).__init__()
+        self.embed_layer = nn.Embedding(21, dim_embed, padding_idx=0) #[0, 20] inclusive
+        self.encoder_decoder = encoder_decoder
+    
+    def forward(self, x, key_padding_mask, attn_mask):
+        x = self.embed_layer(x)
+        x = self.encoder_decoder(x, key_padding_mask, attn_mask)
+        return x
 
 
 def build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2):
@@ -137,6 +129,7 @@ def build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dr
     # dec = PairwiseDistanceDecoder()
     classifier = Classification(dim_embed, n_classes, dropout)
     model = EncoderDecoder(enc, classifier, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
+    model = EncoderDecoderWithEmbedding(dim_embed, model)
 
     for p in model.parameters():
         if p.dim() > 1:
@@ -166,7 +159,7 @@ def train(model, optimizer, criterion, train_loader, device):
     for data, y_true in train_loader:
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
-        # print(x.shape, key_padding_mask.shape, attn_mask.shape)
+        print(x.shape, key_padding_mask.shape, attn_mask.shape)
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss.backward()

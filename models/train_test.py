@@ -14,17 +14,17 @@ from models.SCOPDataset import SCOPDataset
 # hyperparameters
 task="SF"
 max_len=1024
-dim_embed=20
-n_attn_heads=10 # dim_embed must be divisible by num_head
-dim_ff=8*dim_embed
+dim_embed=64
+n_attn_heads=16 #dim_embed must be divisible by num_head
+dim_ff=8*dim_embed #512
 n_encoder_layers=6
 dropout=0.3
 init_lr=0.001
-n_epochs=300
-batch_size=50
+n_epochs=300 #300
+batch_size=50 #50
 start_epoch=1
 device = "cuda" if torch.cuda.is_available() else "cpu"
-out_filename = f"ContextTransformer_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
+out_filename = f"FullContactMapWithEmbedding_task{task}_max_len{max_len}_dim_embed{dim_embed}_n_attn_heads{n_attn_heads}_dim_ff{dim_ff}_n_encoder_layers{n_encoder_layers}_dropout{dropout}_init_lr{init_lr}_n_epochs{n_epochs}_batch_size{batch_size}"
 print(out_filename)
 
 
@@ -41,7 +41,7 @@ n_classes = len(class_dict)
 # model, optimizer, scheduler, criterion, summarywriter
 model = ContextTransformer.build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
 model.to(device)
-# ContextTransformer.init_model(model)
+print(model)
 optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
 criterion = torch.nn.CrossEntropyLoss()
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")

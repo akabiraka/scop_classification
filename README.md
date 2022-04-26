@@ -57,6 +57,7 @@
 * To analize data: `python analyzers/data.py`
 * To analize single datam when generating dataset: `python analyzers/dataset.py`
 * To vizualize the training progress: `tensorboard --logdir=outputs/tensorboard_runs/`
+* To download the runs outputs: `scp -r akabir4@argo.orc.gmu.edu:/scratch/akabir4/scop_classification/outputs/tensorboard_runs/* outputs/tensorboard_runs/`
 
 #### Data issues and resolution
 * If len(chain_id)>1: removed

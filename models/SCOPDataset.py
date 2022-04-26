@@ -35,11 +35,11 @@ class SCOPDataset(Dataset):
         x = x[:self.max_len] #truncate to max_len
         src = torch.cat([x, torch.zeros([self.max_len-x.shape[0], x.shape[1]])]) # padding 0's at the end
         padding_mask = torch.cat([torch.zeros([x.shape[0]]), torch.ones([self.max_len-x.shape[0]])]) # non-zero values indicates ignore
-        out = {"src": src,
+        out = {"src": src.to(dtype=torch.int32),
                "key_padding_mask": padding_mask.to(dtype=torch.bool)}
         return out
 
-    def get_attn_mask(self, dist_matrix):
+    def gets_attn_mask(self, dist_matrix):
         if self.attn_type=="nobackbone": 
             contact_map = np.where((dist_matrix>1.0) & (dist_matrix<8.0), 1, 0)
         elif self.attn_type=="longrange": 
@@ -65,10 +65,16 @@ class SCOPDataset(Dataset):
         feature = Utils.load_pickle("data/features/"+pdb_id+chain_id+region+".pkl")
         dist_matrix = Utils.load_pickle("data/distance_matrices/"+pdb_id+chain_id+region+".pkl")
         
+        # features that will be used in the model
+        feature = torch.tensor(feature[:, -20:]) #taking only 1-hot feature
+        
+        #int amino-acid encoding [1, 20]
+        feature = torch.argmax(feature, dim=1)+1 
+        feature.unsqueeze_(1)
 
         # computing src and key_padding_mask
-        feature = feature[:, -20:] #taking only 1-hot feature
-        data = self.padd(torch.tensor(feature, dtype=torch.float32))
+        data = self.padd(feature)
+        data["src"].squeeze_(1)
         
         # computing attention mask
         data["attn_mask"] = self.get_attn_mask(dist_matrix)
