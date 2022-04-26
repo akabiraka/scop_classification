@@ -39,7 +39,7 @@ class SCOPDataset(Dataset):
                "key_padding_mask": padding_mask.to(dtype=torch.bool)}
         return out
 
-    def gets_attn_mask(self, dist_matrix):
+    def get_attn_mask(self, dist_matrix):
         if self.attn_type=="nobackbone": 
             contact_map = np.where((dist_matrix>1.0) & (dist_matrix<8.0), 1, 0)
         elif self.attn_type=="longrange": 

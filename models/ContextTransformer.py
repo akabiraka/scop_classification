@@ -155,7 +155,7 @@ def padd(input:list, max_len:int):
 def train(model, optimizer, criterion, train_loader, device):
     model.train()
     losses = []
-    for i, data, y_true in enumerate(train_loader):
+    for i, (data, y_true) in enumerate(train_loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         print(x.shape, key_padding_mask.shape, attn_mask.shape)
@@ -172,7 +172,7 @@ def train(model, optimizer, criterion, train_loader, device):
 def test(model, criterion, loader, device):
     model.eval()
     loss_list, acc_list = [], []
-    for i, data, y_true in enumerate(loader):
+    for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         y_pred = model(x, key_padding_mask, attn_mask)
