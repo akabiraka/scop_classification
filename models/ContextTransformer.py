@@ -160,44 +160,48 @@ def padd(input:list, max_len:int):
     return out
 
 
+def compute_accuracy(y_true, y_pred):
+    y_true = y_true.cpu().detach().numpy()
+    y_pred = y_pred.cpu().detach().numpy()
+    y_true, y_pred = np.argmax(y_true, axis=1), np.argmax(y_pred, axis=1)
+    # print(y_true, y_pred)
+    acc = accuracy_score(y_true, y_pred)
+    return acc
+
 def train(model, optimizer, criterion, train_loader, device):
     model.train()
     losses = []
-    for data, y_true in train_loader:
+    for i, (data, y_true) in enumerate(train_loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         # print(x.shape, key_padding_mask.shape, attn_mask.shape)
+        model.zero_grad()
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss.backward()
         optimizer.step()
         losses.append(loss.item())
-        print(f"    loss: {loss.item()}")
+        print(f"   train batch: {i}, loss: {loss.item()}")
         # break
     return np.mean(losses)
 
 
 def test(model, criterion, loader, device):
     model.eval()
-    loss_list, acc_list = [], []
-    for data, y_true in loader:
-        x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
-        attn_mask = torch.cat([i for i in attn_mask])
-        y_pred = model(x, key_padding_mask, attn_mask)
-        loss = criterion(y_pred, y_true.to(device))
-        loss_list.append(loss.item())
+    losses = []
+    
+    with torch.no_grad():
+        for i, (data, y_true) in enumerate(loader):
+            x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
+            attn_mask = torch.cat([i for i in attn_mask])
+            model.zero_grad()
+            y_pred = model(x, key_padding_mask, attn_mask)
+            loss = criterion(y_pred, y_true.to(device))
+            losses.append(loss.item())
+            print(f"   test batch: {i}, loss: {loss.item()}")
 
-        
-        y_true = y_true.cpu().detach().numpy()
-        y_pred = y_pred.cpu().detach().numpy()
-        y_true, y_pred = np.argmax(y_true, axis=1), np.argmax(y_pred, axis=1)
-        # print(y_true, y_pred)
-
-        
-        
-        acc_list.append(accuracy_score(y_true, y_pred))
-        
-    return np.mean(loss_list), np.mean(acc_list)
+            # acc = compute_accuracy(y_true, y_pred)
+    return np.mean(losses)
 
 
 # if __name__ == "__main__":
