@@ -38,6 +38,7 @@ df = pd.read_csv(all_data_file_path)
 x = df[task].unique().tolist()
 class_dict = {j:i for i,j in enumerate(x)}
 n_classes = len(class_dict)
+print(f"n_classes: {n_classes}")
 
 # model, optimizer, scheduler, criterion, summarywriter
 model = ContextTransformer.build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
@@ -71,11 +72,12 @@ if os.path.exists(f"outputs/models/{out_filename}.pth"):
 best_loss = np.inf
 for epoch in range(start_epoch, n_epochs+start_epoch):
     train_loss = ContextTransformer.train(model, optimizer, criterion, train_loader, device)
-    val_loss = ContextTransformer.test(model, criterion, val_loader, device)
+    val_loss, acc = ContextTransformer.test(model, criterion, val_loader, device)
     crnt_lr = optimizer.param_groups[0]["lr"]
-    print(f"Epoch: {epoch:03d}, crnt_lr: {crnt_lr:.5f}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}")
+    print(f"Epoch: {epoch:03d}, crnt_lr: {crnt_lr:.5f}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, acc: {acc:.3f}")
     writer.add_scalar('train loss',train_loss,epoch)
     writer.add_scalar('val loss',val_loss,epoch)
+    writer.add_scalar('acc',acc,epoch)
     writer.add_scalar('crnt_lr',crnt_lr,epoch)
 
     # save model dict

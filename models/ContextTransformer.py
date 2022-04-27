@@ -80,10 +80,8 @@ class Classification(nn.Module):
         self.classifier = nn.Sequential(nn.Linear(dim_embed, int(dim_embed/2)),
                                         nn.ReLU(),
                                         nn.Dropout(dropout),
-                                        nn.Linear(int(dim_embed/2), n_classes),
-                                        nn.ReLU(),
-                                        nn.Dropout(dropout),
-                                        nn.Softmax(dim=1))
+                                        nn.Linear(int(dim_embed/2), n_classes))
+        # do not use softmax as last layer when using cross-entropy loss
     def forward(self, x):
         """x (torch.Tensor): shape [batch_size, len, dim_embed]"""
         x = torch.mean(x, dim=1) #global average pooling. shape [batch_size, dim_embed]
@@ -154,7 +152,7 @@ def padd(input:list, max_len:int):
 def compute_accuracy(y_true, y_pred):
     y_true = y_true.cpu().detach().numpy()
     y_pred = y_pred.cpu().detach().numpy()
-    y_true, y_pred = np.argmax(y_true, axis=1), np.argmax(y_pred, axis=1)
+    y_pred = np.argmax(y_pred, axis=1)
     # print(y_true, y_pred)
     acc = accuracy_score(y_true, y_pred)
     return acc
@@ -179,7 +177,7 @@ def train(model, optimizer, criterion, train_loader, device):
 
 def test(model, criterion, loader, device):
     model.eval()
-    losses = []
+    losses, acc_list = [], []
     with torch.no_grad():
         for i, (data, y_true) in enumerate(loader):
             x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
@@ -190,10 +188,11 @@ def test(model, criterion, loader, device):
             losses.append(loss.item())
             print(f"    test batch: {i}, loss: {loss.item()}")
             
-            # acc = compute_accuracy(y_true, y_pred)
-            # print(f"                     acc: {acc}")
+            acc = compute_accuracy(y_true, y_pred)
+            acc_list.append(acc)
+            print(f"                    acc: {acc}")
 
-    return np.mean(losses)
+    return np.mean(losses), np.mean(acc_list)
 
 
 # if __name__ == "__main__":
