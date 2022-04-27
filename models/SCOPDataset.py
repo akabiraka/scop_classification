@@ -75,6 +75,7 @@ class SCOPDataset(Dataset):
 
         # making ground-truth class tensor
         class_id = self.class_dict[self.df.loc[index, self.task]]
-        label = F.one_hot(torch.tensor(class_id), len(self.class_dict)).to(dtype=torch.float32)
-        
+        label = torch.tensor(class_id, dtype=torch.long)
+        # do not use 1-hot class encoding with cross-entropy
+        # label = F.one_hot(torch.tensor(class_id), len(self.class_dict)).to(dtype=torch.float32) # 1-hot class encoding
         return data, label

@@ -13,15 +13,15 @@ from models.SCOPDataset import SCOPDataset
 
 # hyperparameters
 task="SF"
-max_len=1024
+max_len=1024 #1024
 dim_embed=20
 n_attn_heads=10 # dim_embed must be divisible by num_head
 dim_ff=8*dim_embed
 n_encoder_layers=6
 dropout=0.3
 init_lr=0.001
-n_epochs=300
-batch_size=50
+n_epochs=300 #300
+batch_size=50 #50
 start_epoch=1
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -38,6 +38,7 @@ df = pd.read_csv(all_data_file_path)
 x = df[task].unique().tolist()
 class_dict = {j:i for i,j in enumerate(x)}
 n_classes = len(class_dict)
+print(f"n_classes: {n_classes}")
 
 # model, optimizer, scheduler, criterion, summarywriter
 model = ContextTransformer.build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
@@ -64,18 +65,19 @@ if os.path.exists(f"outputs/models/{out_filename}.pth"):
     # train for more epochs with new lr
     start_epoch = prev_n_epochs+1
     n_epochs = 10
-    new_lr=0.0001
+    new_lr=0.001
     optimizer = torch.optim.Adam(model.parameters(), lr=new_lr, weight_decay=5e-4)
     print(f"Train for {n_epochs} more epochs...")
 
 best_loss = np.inf
 for epoch in range(start_epoch, n_epochs+start_epoch):
     train_loss = ContextTransformer.train(model, optimizer, criterion, train_loader, device)
-    val_loss = ContextTransformer.test(model, criterion, val_loader, device)
+    val_loss, acc = ContextTransformer.test(model, criterion, val_loader, device)
     crnt_lr = optimizer.param_groups[0]["lr"]
-    print(f"Epoch: {epoch:03d}, crnt_lr: {crnt_lr:.5f}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}")
+    print(f"Epoch: {epoch:03d}, crnt_lr: {crnt_lr:.5f}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, acc: {acc:.3f}")
     writer.add_scalar('train loss',train_loss,epoch)
     writer.add_scalar('val loss',val_loss,epoch)
+    writer.add_scalar('acc',acc,epoch)
     writer.add_scalar('crnt_lr',crnt_lr,epoch)
 
     # save model dict
