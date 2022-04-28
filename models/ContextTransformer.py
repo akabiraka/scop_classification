@@ -89,9 +89,40 @@ class Classification(nn.Module):
         return x
 
 
-class EncoderDecoder(nn.Module):
-    def __init__(self, encoder, decoder, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout):
-        super(EncoderDecoder, self).__init__()
+class Embeddings(nn.Module):
+    def __init__(self, vocab_size, dim_embed):
+        super(Embeddings, self).__init__()
+        self.embed = nn.Embedding(vocab_size, dim_embed)
+        self.dim_embed = dim_embed
+
+    def forward(self, x):
+        return self.embed(x) * np.sqrt(self.dim_embed)
+
+class PositionalEncoding(nn.Module):
+    "Implement the PE function."
+    def __init__(self, dim_embed, dropout, max_len=1024):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(p=dropout)
+        
+        # Compute the positional encodings once in log space.
+        pe = torch.zeros(max_len, dim_embed)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, dim_embed, 2) *
+                             -(np.log(10000.0) / dim_embed))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
+        self.register_buffer('pe', pe)
+        
+    def forward(self, x):
+        x = x + torch.tensor(self.pe[:, :x.size(1)], requires_grad=False)
+        return self.dropout(x)
+
+
+class EncoderDecoderWithEmbedding(nn.Module):
+    def __init__(self, embed_layer, encoder, decoder, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout):
+        super(EncoderDecoderWithEmbedding, self).__init__()
+        self.embed_layer = embed_layer
         self.encoder = encoder
         self.decoder = decoder
         self.dim_embed = dim_embed
@@ -102,31 +133,29 @@ class EncoderDecoder(nn.Module):
         self.dropout = dropout
     
     def forward(self, x, key_padding_mask, attn_mask):
-        x = self.encoder(x, key_padding_mask, attn_mask)
-        x = self.decoder(x)
-        return x
-
-class EncoderDecoderWithEmbedding(nn.Module):
-    def __init__(self, dim_embed, encoder_decoder):
-        super(EncoderDecoderWithEmbedding, self).__init__()
-        self.embed_layer = nn.Embedding(21, dim_embed, padding_idx=0) #[0, 20] inclusive
-        self.encoder_decoder = encoder_decoder
-    
-    def forward(self, x, key_padding_mask, attn_mask):
+        print(x.shape)
         x = self.embed_layer(x)
-        x = self.encoder_decoder(x, key_padding_mask, attn_mask)
+        print(x.shape)
+        x = self.encoder(x, key_padding_mask, attn_mask)
+        print(x.shape)
+        x = self.decoder(x)
+        print(x.shape)
         return x
 
 
-def build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2):
+
+def build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2):
     cp = copy.deepcopy
     attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=True)
     ff = PositionwiseFeedForward(dim_embed, dim_ff, dropout)
     enc = Encoder(EncoderLayer(dim_embed, cp(attn), cp(ff), dropout), n_encoder_layers)
+    pos_encod = PositionalEncoding(dim_embed, dropout, max_len)
+    embed_layer = Embeddings(21, dim_embed)  #[0, 20] inclusive
+
     # dec = PairwiseDistanceDecoder()
     classifier = Classification(dim_embed, n_classes, dropout)
-    model = EncoderDecoder(enc, classifier, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
-    model = EncoderDecoderWithEmbedding(dim_embed, model)
+    model = EncoderDecoderWithEmbedding(nn.Sequential(embed_layer, cp(pos_encod)), enc, classifier, 
+                                    dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
 
     for p in model.parameters():
         if p.dim() > 1:

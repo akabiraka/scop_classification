@@ -14,18 +14,18 @@ from models.SCOPDataset import SCOPDataset
 # hyperparameters
 task="SF"
 max_len=1024
-dim_embed=64
+dim_embed=512
 n_attn_heads=16 #dim_embed must be divisible by num_head
-dim_ff=8*dim_embed #512
+dim_ff=4*dim_embed 
 n_encoder_layers=6
 dropout=0.3
 init_lr=0.001
-n_epochs=300 #300
-batch_size=50 #50
+n_epochs=1000 #300
+batch_size=100 #50
 start_epoch=1
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu"
-out_filename = f"Embedding_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}"
+out_filename = f"EmbeddingPos_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}"
 print(out_filename)
 
 
@@ -41,7 +41,7 @@ n_classes = len(class_dict)
 print(f"n_classes: {n_classes}")
 
 # model, optimizer, scheduler, criterion, summarywriter
-model = ContextTransformer.build_model(dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
+model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout)
 model.to(device)
 # print(model)
 optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
