@@ -133,13 +133,9 @@ class EncoderDecoderWithEmbedding(nn.Module):
         self.dropout = dropout
     
     def forward(self, x, key_padding_mask, attn_mask):
-        print(x.shape)
         x = self.embed_layer(x)
-        print(x.shape)
         x = self.encoder(x, key_padding_mask, attn_mask)
-        print(x.shape)
         x = self.decoder(x)
-        print(x.shape)
         return x
 
 
