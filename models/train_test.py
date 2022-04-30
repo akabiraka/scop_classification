@@ -44,7 +44,7 @@ print(f"n_classes: {n_classes}")
 # model
 model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer)
 model.to(device)
-trainable = ContextTransformer.compute_accuracy(model)
+trainable = ContextTransformer.count_parameters(model)
 print(f"trainable weights: {trainable}")
 
 # optimizer, scheduler, criterion, summarywriter
