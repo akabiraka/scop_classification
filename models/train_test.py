@@ -9,19 +9,19 @@ from torch.utils.data import DataLoader
 
 import models.ContextTransformer as ContextTransformer
 from models.SCOPDataset import SCOPDataset
-
+torch.cuda.empty_cache()
 
 # hyperparameters
 task="SF"
-max_len=1024 #1024
-dim_embed=512 #512
-n_attn_heads=16 #16 #dim_embed must be divisible by num_head
+max_len=512 #1024
+dim_embed=128 #512
+n_attn_heads=8 #16 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=6
 dropout=0.3
 init_lr=0.001
-n_epochs=1000 
-batch_size=100 #100
+n_epochs=1000 #1000 
+batch_size=50 #100
 start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange

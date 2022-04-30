@@ -18,7 +18,7 @@
 ##SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1                 # up to 128; 
 #SBATCH --gres=gpu:A100.40gb:1              # up to 8; only request what you need
-#SBATCH --mem-per-cpu=16000MB               # memory per CORE; total memory is 1 TB (1,000,000 MB)
+#SBATCH --mem-per-cpu=32000MB               # memory per CORE; total memory is 1 TB (1,000,000 MB)
 
 ## cpu jobs
 ##python generators/DownloadCleanFasta.py

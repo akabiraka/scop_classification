@@ -139,8 +139,11 @@ class EncoderDecoder(nn.Module):
     def forward(self, x, key_padding_mask, attn_mask):
         if self.include_embed_layer:
             x = self.embed_layer(x)
+            #print(x.shape)
         x = self.encoder(x, key_padding_mask, attn_mask)
+        #print(x.shape)
         x = self.decoder(x)
+        #print(x.shape)
         return x
 
 
