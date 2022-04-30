@@ -196,7 +196,7 @@ def train(model, optimizer, criterion, train_loader, device):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         # print(x.shape, key_padding_mask.shape, attn_mask.shape)
-        model.zero_grad()
+        model.zero_grad(set_to_none=True)
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss.backward()
@@ -206,23 +206,22 @@ def train(model, optimizer, criterion, train_loader, device):
         # break
     return np.mean(losses)
 
-
+@torch.no_grad()
 def test(model, criterion, loader, device):
     model.eval()
     losses, acc_list = [], []
-    with torch.no_grad():
-        for i, (data, y_true) in enumerate(loader):
-            x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
-            attn_mask = torch.cat([i for i in attn_mask])
-            model.zero_grad()
-            y_pred = model(x, key_padding_mask, attn_mask)
-            loss = criterion(y_pred, y_true.to(device))
-            losses.append(loss.item())
-            print(f"    test batch: {i}, loss: {loss.item()}")
-            
-            acc = compute_accuracy(y_true, y_pred)
-            acc_list.append(acc)
-            print(f"                    acc: {acc}")
+    for i, (data, y_true) in enumerate(loader):
+        x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
+        attn_mask = torch.cat([i for i in attn_mask])
+        model.zero_grad(set_to_none=True)
+        y_pred = model(x, key_padding_mask, attn_mask)
+        loss = criterion(y_pred, y_true.to(device))
+        losses.append(loss.item())
+        print(f"    test batch: {i}, loss: {loss.item()}")
+        
+        acc = compute_accuracy(y_true, y_pred)
+        acc_list.append(acc)
+        print(f"                    acc: {acc}")
 
     return np.mean(losses), np.mean(acc_list)
 
