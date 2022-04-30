@@ -41,10 +41,13 @@ class_dict = {j:i for i,j in enumerate(x)}
 n_classes = len(class_dict)
 print(f"n_classes: {n_classes}")
 
-# model, optimizer, scheduler, criterion, summarywriter
+# model
 model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer)
 model.to(device)
-# print(model)
+trainable = ContextTransformer.compute_accuracy(model)
+print(f"trainable weights: {trainable}")
+
+# optimizer, scheduler, criterion, summarywriter
 optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
 criterion = torch.nn.CrossEntropyLoss()
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")

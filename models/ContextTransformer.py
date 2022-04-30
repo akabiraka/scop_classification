@@ -92,7 +92,7 @@ class Classification(nn.Module):
 class Embeddings(nn.Module):
     def __init__(self, vocab_size, dim_embed):
         super(Embeddings, self).__init__()
-        self.embed = nn.Embedding(vocab_size, dim_embed)
+        self.embed = nn.Embedding(vocab_size, dim_embed, padding_idx=0)
         self.dim_embed = dim_embed
 
     def forward(self, x):
@@ -161,6 +161,10 @@ def build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_cl
             nn.init.xavier_uniform_(p)
 
     return model
+
+def count_parameters(model):
+    trainable_weights = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    return trainable_weights
 
 
 def padd(input:list, max_len:int):
