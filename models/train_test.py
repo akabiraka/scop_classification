@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
+from sklearn.utils.class_weight import compute_class_weight
 
 import models.ContextTransformer as ContextTransformer
 from models.SCOPDataset import SCOPDataset
@@ -13,21 +14,22 @@ torch.cuda.empty_cache()
 
 # hyperparameters
 task="SF"
-max_len=1024 #1024
+max_len=512 #1024
 dim_embed=128 #512
-n_attn_heads=16 #16 #dim_embed must be divisible by num_head
+n_attn_heads=8 #16 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5
-dropout=0.3
+dropout=0.1
 init_lr=0.001
 n_epochs=1000 #1000 
-batch_size=20 #100
+batch_size=64 #100
 start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu"
-out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
+out_filename = f"clsW_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
 print(out_filename)
+
 
 
 all_data_file_path="data/splits/all_cleaned.txt"
@@ -41,6 +43,13 @@ class_dict = {j:i for i,j in enumerate(x)}
 n_classes = len(class_dict)
 print(f"n_classes: {n_classes}")
 
+# computing class weights from the train data
+train_df = pd.read_csv(train_data_file_path, header=None)
+class_weights = compute_class_weight("balanced", classes=train_df[task].unique(), y=train_df[task].to_numpy())
+class_weights = torch.tensor(class_weights, dtype=torch.float)
+# print(train_df[label_col].value_counts(sort=False))
+# print(class_weights)
+
 # model
 model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer)
 model.to(device)
@@ -49,7 +58,7 @@ print(f"trainable weights: {trainable}")
 
 # optimizer, scheduler, criterion, summarywriter
 optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
-criterion = torch.nn.CrossEntropyLoss()
+criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")
 
 # dataset and dataloader
