@@ -3,9 +3,9 @@
 ## this must be run from directory where run.py exists.
 ## --workdir is not used in this file.
 
-#SBATCH --job-name=scopA
-#SBATCH --output=/scratch/akabir4/scop_classification/outputs/argo_logs/scopA-%j.out
-#SBATCH --error=/scratch/akabir4/scop_classification/outputs/argo_logs/scopA-%j.err
+#SBATCH --job-name=eval
+#SBATCH --output=/scratch/akabir4/scop_classification/outputs/argo_logs/eval-%j.out
+#SBATCH --error=/scratch/akabir4/scop_classification/outputs/argo_logs/eval-%j.err
 #SBATCH --mail-user=<akabir4@gmu.edu>
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -19,5 +19,6 @@
 #SBATCH --mem=32000MB
 ##SBATCH --time=1-24:00
 
-nvidia-smi
-python models/train_test.py
+##nvidia-smi
+##python models/train_test.py
+python models/eval

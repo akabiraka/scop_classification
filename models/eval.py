@@ -15,18 +15,18 @@ max_len=512 #1024
 dim_embed=128 #512
 n_attn_heads=8 #16 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
-n_encoder_layers=6
-dropout=0.3
-init_lr=0.001
+n_encoder_layers=5
+dropout=0.1
+init_lr=1e-5
 n_epochs=1000 #1000 
-batch_size=50 #100
+batch_size=64 #100
 start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
-out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
+out_filename = f"clsW_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
 print(out_filename)
-# Model_contactmap_SF_512_128_8_512_6_0.3_0.001_1000_50_True_cuda
+# clsW_contactmap_SF_512_128_8_512_5_0.1_1e-05_1000_64_True_cuda
 
 
 all_data_file_path="data/splits/all_cleaned.txt"
@@ -53,7 +53,6 @@ model.load_state_dict(checkpoint['model_state_dict'])
 
 def test(model, loader, device):
     model.eval()
-    losses, acc_list = [], []
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
