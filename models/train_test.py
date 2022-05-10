@@ -20,7 +20,7 @@ n_attn_heads=8 #16 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5
 dropout=0.1
-init_lr=0.00001
+init_lr=1e-5
 n_epochs=1000 #1000 
 batch_size=64 #100
 start_epoch=1
@@ -64,7 +64,7 @@ writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")
 # dataset and dataloader
 train_dataset = SCOPDataset(train_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
-train_loader = DataLoader(train_dataset, batch_size, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size, shuffle=False)
 print(f"train batches: {len(train_loader)}, val batches: {len(val_loader)}")
 
