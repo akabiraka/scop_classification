@@ -46,7 +46,7 @@ trainable = ContextTransformer.count_parameters(model)
 print(f"trainable weights: {trainable}")
 
 val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
-val_loader = DataLoader(val_dataset, len(val_dataset), shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 
 checkpoint = torch.load(f"outputs/models/{out_filename}.pth")
 model.load_state_dict(checkpoint['model_state_dict'])
@@ -60,8 +60,8 @@ def test(model, loader, device):
         model.zero_grad(set_to_none=True)
         y_pred = model(x, key_padding_mask, attn_mask)
         
-        print("y_pred: {y_pred}")
-        print("y_true: {y_true}")
+        print(f"y_pred: {y_pred.argmax(dim=1).cpu().numpy()}")
+        print(f"y_true: {y_true.cpu().numpy()}")
         print()
         # break
 

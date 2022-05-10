@@ -26,5 +26,6 @@
 ##python generators/Features.py
 
 ## gpu jobs
-nvidia-smi
-python models/train_test.py
+##nvidia-smi
+##python models/train_test.py
+python models/eval.py
