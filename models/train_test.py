@@ -44,9 +44,9 @@ n_classes = len(class_dict)
 print(f"n_classes: {n_classes}")
 
 # computing class weights from the train data
-train_df = pd.read_csv(train_data_file_path, header=None)
+train_df = pd.read_csv(train_data_file_path)
 class_weights = compute_class_weight("balanced", classes=train_df[task].unique(), y=train_df[task].to_numpy())
-class_weights = torch.tensor(class_weights, dtype=torch.float)
+class_weights = torch.tensor(class_weights, dtype=torch.float, device=device)
 # print(train_df[label_col].value_counts(sort=False))
 # print(class_weights)
 
