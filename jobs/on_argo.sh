@@ -3,9 +3,9 @@
 ## this must be run from directory where run.py exists.
 ## --workdir is not used in this file.
 
-#SBATCH --job-name=argo
-#SBATCH --output=/scratch/akabir4/scop_classification/outputs/argo_logs/argo-%j.out
-#SBATCH --error=/scratch/akabir4/scop_classification/outputs/argo_logs/argo-%j.err
+#SBATCH --job-name=scopA
+#SBATCH --output=/scratch/akabir4/scop_classification/outputs/argo_logs/scopA-%j.out
+#SBATCH --error=/scratch/akabir4/scop_classification/outputs/argo_logs/scopA-%j.err
 #SBATCH --mail-user=<akabir4@gmu.edu>
 #SBATCH --mail-type=BEGIN,END,FAIL
 

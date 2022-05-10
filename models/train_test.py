@@ -20,7 +20,7 @@ n_attn_heads=8 #16 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5
 dropout=0.1
-init_lr=0.001
+init_lr=0.00001
 n_epochs=1000 #1000 
 batch_size=64 #100
 start_epoch=1
@@ -57,7 +57,7 @@ trainable = ContextTransformer.count_parameters(model)
 print(f"trainable weights: {trainable}")
 
 # optimizer, scheduler, criterion, summarywriter
-optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=5e-4)
+optimizer = torch.optim.AdamW(model.parameters(), lr=init_lr, weight_decay=0.01)
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 writer = SummaryWriter(f"outputs/tensorboard_runs/{out_filename}")
 
@@ -79,7 +79,7 @@ if os.path.exists(f"outputs/models/{out_filename}.pth"):
     start_epoch = prev_n_epochs+1
     n_epochs = 10
     new_lr=0.0001
-    optimizer = torch.optim.Adam(model.parameters(), lr=new_lr, weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=new_lr, weight_decay=0.01)
     print(f"Train for {n_epochs} more epochs...")
 
 best_loss = np.inf
