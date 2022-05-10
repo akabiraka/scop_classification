@@ -27,7 +27,7 @@ start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu"
-out_filename = f"clsW_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
+out_filename = f"newclassifier_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
 print(out_filename)
 
 

@@ -77,16 +77,21 @@ class PairwiseDistanceDecoder(nn.Module):
 class Classification(nn.Module):
     def __init__(self, dim_embed, n_classes, dropout=0.5):
         super(Classification, self).__init__()
-        self.classifier = nn.Sequential(nn.Linear(dim_embed, int(dim_embed/2)),
-                                        nn.ReLU(),
-                                        nn.Dropout(dropout),
-                                        nn.Linear(int(dim_embed/2), n_classes))
-        # do not use softmax as last layer when using cross-entropy loss
-    def forward(self, x):
-        """x (torch.Tensor): shape [batch_size, len, dim_embed]"""
-        x = torch.mean(x, dim=1) #global average pooling. shape [batch_size, dim_embed]
-        x = self.classifier(x)
-        return x
+
+        self.attn_linear = torch.nn.Linear(dim_embed, 1)
+        self.classifier = nn.Linear(dim_embed, n_classes)
+
+    def forward(self, last_hidden_state):
+        """last_hidden_state (torch.Tensor): shape [batch_size, seq_len, dim_embed]"""
+        # x = torch.mean(x, dim=1) #global average pooling. shape [batch_size, dim_embed]
+        activation = torch.tanh(last_hidden_state) # [batch_size, seq_len, dim_embed]
+
+        score = self.attn_linear(activation) # [batch_size, seq_len, 1]      
+        weights = torch.softmax(score, dim=1) # [batch_size, seq_len, 1]
+        x = torch.sum(weights * last_hidden_state, dim=1)  # [batch_size, dim_embed]
+
+        out = self.classifier(x) # [batch_size, n_classes]
+        return out
 
 
 class Embeddings(nn.Module):
