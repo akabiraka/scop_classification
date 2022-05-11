@@ -1,4 +1,5 @@
 import sys
+from turtle import forward
 sys.path.append("../scop_classification")
 import torch
 import torch.nn as nn
@@ -48,8 +49,7 @@ class EncoderLayer(nn.Module):
         self.dim_embed = dim_embed
 
     def forward(self, x, key_padding_mask, attn_mask):
-        attn_output, _ = self.attention(x, x, x, key_padding_mask, attn_mask=attn_mask)
-        x = self.sublayer[0](x, lambda x: attn_output)
+        x = self.sublayer[0](x, lambda y: self.attention(y, y, y, key_padding_mask, attn_mask))
         return self.sublayer[1](x, self.feed_forward)
 
 
@@ -151,11 +151,19 @@ class EncoderDecoder(nn.Module):
         #print(x.shape)
         return x
 
+class MultiheadAttentionWrapper(nn.Module):
+    def __init__(self, dim_embed, n_attn_heads, batch_first=True) -> None:
+        super(MultiheadAttentionWrapper, self).__init__()
+        self.attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=batch_first)
+
+    def forward(self, query, key, value, key_padding_mask=None, attn_mask=None):
+        attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask, attn_mask=attn_mask)
+        return attn_output
 
 
 def build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2, include_embed_layer=False):
     cp = copy.deepcopy
-    attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=True)
+    attn = MultiheadAttentionWrapper(dim_embed, n_attn_heads, batch_first=True)
     ff = PositionwiseFeedForward(dim_embed, dim_ff, dropout)
     enc = Encoder(EncoderLayer(dim_embed, cp(attn), cp(ff), dropout), n_encoder_layers)
     classifier = Classification(dim_embed, n_classes, dropout) # dec = PairwiseDistanceDecoder()
@@ -186,6 +194,7 @@ def padd(input:list, max_len:int):
            "src_key_padding_mask": torch.cat(padding_mask)}
     return out
 
+
 def compute_accuracy(y_true, y_pred):
     y_true = y_true.cpu().detach().numpy()
     y_pred = y_pred.cpu().detach().numpy()
@@ -193,6 +202,7 @@ def compute_accuracy(y_true, y_pred):
     # print(y_true, y_pred)
     acc = accuracy_score(y_true, y_pred)
     return acc
+
 
 def train(model, optimizer, criterion, train_loader, device):
     model.train()
@@ -208,6 +218,9 @@ def train(model, optimizer, criterion, train_loader, device):
         optimizer.step()
         losses.append(loss.item())
         print(f"    train batch: {i}, loss: {loss.item()}")
+
+        # acc = compute_accuracy(y_true, y_pred)
+        # print(f"                    acc: {acc}")
         # break
     return np.mean(losses)
 
@@ -222,11 +235,11 @@ def test(model, criterion, loader, device):
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         losses.append(loss.item())
-        print(f"    test batch: {i}, loss: {loss.item()}")
+        # print(f"    test batch: {i}, loss: {loss.item()}")
         
         acc = compute_accuracy(y_true, y_pred)
         acc_list.append(acc)
-        print(f"                    acc: {acc}")
+        # print(f"                    acc: {acc}")
 
     return np.mean(losses), np.mean(acc_list)
 
