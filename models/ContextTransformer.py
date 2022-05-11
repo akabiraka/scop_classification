@@ -195,15 +195,6 @@ def padd(input:list, max_len:int):
     return out
 
 
-def compute_accuracy(y_true, y_pred):
-    y_true = y_true.cpu().detach().numpy()
-    y_pred = y_pred.cpu().detach().numpy()
-    y_pred = np.argmax(y_pred, axis=1)
-    # print(y_true, y_pred)
-    acc = accuracy_score(y_true, y_pred)
-    return acc
-
-
 def train(model, optimizer, criterion, train_loader, device):
     model.train()
     losses = []
@@ -224,24 +215,64 @@ def train(model, optimizer, criterion, train_loader, device):
         # break
     return np.mean(losses)
 
+
 @torch.no_grad()
 def test(model, criterion, loader, device):
     model.eval()
-    losses, acc_list = [], []
+    losses, pred_labels, true_labels = [], [], []
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         model.zero_grad(set_to_none=True)
         y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
-        losses.append(loss.item())
-        # print(f"    test batch: {i}, loss: {loss.item()}")
         
-        acc = compute_accuracy(y_true, y_pred)
-        acc_list.append(acc)
-        # print(f"                    acc: {acc}")
+        losses.append(loss.item())
+        pred_labels.append(y_pred.argmax(dim=1).cpu().numpy())
+        true_labels.append(y_true.cpu().numpy())
+        
+    metrics = get_metrics(true_labels, pred_labels)
+    loss = np.mean(losses)
+    return loss, metrics
 
-    return np.mean(losses), np.mean(acc_list)
+
+def get_metrics(target_classes, pred_classes):
+    from sklearn.metrics import accuracy_score, recall_score, precision_score
+    acc = accuracy_score(target_classes, pred_classes)
+    precision = precision_score(target_classes, pred_classes, average="micro")
+    recall = recall_score(target_classes, pred_classes, average="micro")
+    return {"acc": acc, 
+            "precision": precision, 
+            "recall": recall, 
+            "pred_classes": pred_classes, 
+            "target_classes": target_classes}
+
+# def compute_accuracy(y_true, y_pred):
+#     y_true = y_true.cpu().detach().numpy()
+#     y_pred = y_pred.cpu().detach().numpy()
+#     y_pred = np.argmax(y_pred, axis=1)
+#     # print(y_true, y_pred)
+#     acc = accuracy_score(y_true, y_pred)
+#     return acc
+
+# @torch.no_grad()
+# def test(model, criterion, loader, device):
+#     model.eval()
+#     losses, acc_list = [], []
+#     for i, (data, y_true) in enumerate(loader):
+#         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
+#         attn_mask = torch.cat([i for i in attn_mask])
+#         model.zero_grad(set_to_none=True)
+#         y_pred = model(x, key_padding_mask, attn_mask)
+#         loss = criterion(y_pred, y_true.to(device))
+#         losses.append(loss.item())
+#         # print(f"    test batch: {i}, loss: {loss.item()}")
+        
+#         acc = compute_accuracy(y_true, y_pred)
+#         acc_list.append(acc)
+#         # print(f"                    acc: {acc}")
+
+#     return np.mean(losses), np.mean(acc_list)
 
 
 # if __name__ == "__main__":
