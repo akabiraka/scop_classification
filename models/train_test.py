@@ -16,9 +16,9 @@ torch.cuda.empty_cache()
 task="SF"
 max_len=512 #512
 dim_embed=128 #128
-n_attn_heads=4 #8 #dim_embed must be divisible by num_head
+n_attn_heads=8 #8 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
-n_encoder_layers=3 #5
+n_encoder_layers=5 #5
 dropout=0.1
 init_lr=1e-5
 n_epochs=1000 #1000 
@@ -27,7 +27,7 @@ start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
-out_filename = f"CT_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
+out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
 print(out_filename)
 
 
