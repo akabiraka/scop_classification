@@ -85,7 +85,7 @@ print(f"train batches: {len(train_loader)}, val batches: {len(val_loader)}")
 #     optimizer = torch.optim.Adam(model.parameters(), lr=new_lr, weight_decay=0.01)
 #     print(f"Train for {n_epochs} more epochs...")
 
-# best_loss = np.inf
+best_loss = np.inf
 for epoch in range(start_epoch, n_epochs+start_epoch):
     train_loss = ContextTransformer.train(model, optimizer, criterion, train_loader, device)
     val_loss, acc = ContextTransformer.test(model, criterion, val_loader, device)
