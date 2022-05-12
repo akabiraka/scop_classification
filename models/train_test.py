@@ -15,14 +15,14 @@ torch.cuda.empty_cache()
 # hyperparameters
 task="SF"
 max_len=512 #512
-dim_embed=128 #128
+dim_embed=256 #128
 n_attn_heads=8 #8 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5 #5
 dropout=0.1
 init_lr=1e-4
 n_epochs=1000 #1000 
-batch_size=128 #64
+batch_size=64 #64
 start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange
