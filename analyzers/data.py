@@ -19,26 +19,54 @@ def print_class_distribution(df):
 
 
 # 
-def set_height_as_bar_label(rects, ax):
+def set_height_as_bar_label(rects, ax, i):
     """Attach a text label above each bar in *rects*, displaying its height."""
-    for rect in rects:
+    
+    rect = rects[i]
+    height = rect.get_height()
+    ax.annotate(f"{i, height}",
+                xy=(i, height+10), c="red", rotation=45)
+                
+    for i in range(0, len(rects), 100):
+        rect = rects[i]
         height = rect.get_height()
         ax.annotate('{}'.format(height),
-                    xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 3),  # 3 points vertical offset
-                    textcoords="offset points",
-                    ha='center', va='bottom')
+                    xy=(rect.get_x() , height)),
+                    # xytext=(0, 3),  # 3 points vertical offset
+                    # textcoords="offset points",
+                    # ha='center', va='bottom')
 
-def plot_class_distribution(df, class_label="SF"):
-    x = df[class_label].value_counts()
-    rects = plt.bar(range(1, len(x)+1), x)
-    # set_height_as_bar_label(rects, plt)
-    # plt.show()
-    plt.savefig(f"outputs/images/{class_label}_distribution.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
+def plot_class_distribution(df, class_label="SF", img_format="png", set_height=False, label="image"):
+    # print(df[class_label])
+    x = df[class_label].value_counts(sort=True)
+    print(f"classes having >=10 entries: {len(x[x>=10])}") #637
+    print(f"classes having <10 entries: {len(x[x<10])}")
+    i = len(x[x>=10])-1 # ith_cls_having_10_data_points
 
+    plt.figure(figsize=(10, 6))
+    rects = plt.bar(range(0, len(x)), x)
+    if set_height: set_height_as_bar_label(rects, plt, i)
+    
+    plt.xlabel(f"Class labels (alised from 0 to {len(x)-1})")
+    plt.ylabel("Numer of entries (sorted)")
+    # plt.xticks([])
+    plt.show()
+    # plt.savefig(f"outputs/images/{label}.{img_format}", dpi=300, format=img_format, bbox_inches='tight', pad_inches=0.0)
+
+
+base_file_path = "data/splits/scop-cla-latest.txt"
+df = pd.read_csv(base_file_path, header=None, delimiter=" ")
+print(f"num of entries in base dataset: {len(df)}")
 
 inp_file_path = "data/splits/all_cleaned.txt"
 class_label="SF"
 df = pd.read_csv(inp_file_path, dtype={class_label: object})
 print_class_distribution(df)
-plot_class_distribution(df, class_label)
+plot_class_distribution(df, class_label, "png", set_height=True, label=f"{class_label}_distribution_sorted")
+
+# the following can be used to see the train/val/test data distribution
+# inp_file_path = "data/splits/test_5862.txt"
+# class_label="SF"
+# df = pd.read_csv(inp_file_path, dtype={class_label: object})
+# print_class_distribution(df)
+# plot_class_distribution(df, class_label, "png", set_height=True, label="test_distribution_sorted")
