@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 import torch
+import utils as Utils
 
 import models.ContextTransformer as ContextTransformer
 from models.SCOPDataset import SCOPDataset
@@ -85,8 +86,6 @@ def test(model, criterion, loader, device, return_classes=False):
 
 def get_metrics(target_classes, pred_classes, true_onehot_distributions, pred_distributions, return_classes=False):
     from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score, confusion_matrix
-    import seaborn as sn
-    import matplotlib.pyplot as plt
     acc = accuracy_score(target_classes, pred_classes)
     precision = precision_score(target_classes, pred_classes, average="micro")
     recall = recall_score(target_classes, pred_classes, average="micro")
@@ -94,10 +93,8 @@ def get_metrics(target_classes, pred_classes, true_onehot_distributions, pred_di
     roc_auc = roc_auc_score(true_onehot_distributions, pred_distributions, average="micro", multi_class="ovr")
     cm = confusion_matrix(target_classes, pred_classes)
     
-    sn.heatmap(cm, annot=True)
-    plt.savefig(f"outputs/images/cm.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
-
-    out = {"acc": acc, "precision": precision, "recall": recall, "f1": f1, "roc_auc": roc_auc}
+    out = {"acc": acc, "precision": precision, "recall": recall, 
+           "f1": f1, "roc_auc": roc_auc, "cm": cm}
         
     if return_classes: 
         out["pred_classes"] = pred_classes
@@ -111,6 +108,7 @@ val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(val_loader)}")
 val_loss, metrics = test(model, criterion, val_loader, device, return_classes=False)
 print(f"Val: {val_loss}, {metrics}")
+Utils.save_as_pickle(metrics["cm"], "outputs/images/val_cm.pkl")
 
 # evaluating test set
 test_data_file_path="data/splits/test_5862.txt"
@@ -119,3 +117,4 @@ test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(test_loader)}")
 test_loss, metrics = test(model, criterion, test_loader, device, return_classes=False)
 print(f"Test: {test_loss}, {metrics}")
+Utils.save_as_pickle(metrics["cm"], "outputs/images/test_cm.pkl")
