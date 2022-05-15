@@ -84,12 +84,18 @@ def test(model, criterion, loader, device, return_classes=False):
 
 
 def get_metrics(target_classes, pred_classes, true_onehot_distributions, pred_distributions, return_classes=False):
-    from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score
+    from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score, confusion_matrix
+    import seaborn as sn
+    import matplotlib.pyplot as plt
     acc = accuracy_score(target_classes, pred_classes)
     precision = precision_score(target_classes, pred_classes, average="micro")
     recall = recall_score(target_classes, pred_classes, average="micro")
     f1 = f1_score(target_classes, pred_classes, average="micro")
     roc_auc = roc_auc_score(true_onehot_distributions, pred_distributions, average="micro", multi_class="ovr")
+    cm = confusion_matrix(target_classes, pred_classes)
+    
+    sn.heatmap(cm, annot=True)
+    plt.savefig(f"outputs/images/cm.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
 
     out = {"acc": acc, "precision": precision, "recall": recall, "f1": f1, "roc_auc": roc_auc}
         
