@@ -54,7 +54,7 @@ model.load_state_dict(checkpoint['model_state_dict'])
 def test(model, criterion, loader, device, return_classes=False):
     model.eval()
     losses, pred_labels, true_labels = [], [], []
-    pred_distributions, true_onehot_distributions = [], []
+    pred_class_distributions, true_onehot_distributions = [], []
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
@@ -70,8 +70,8 @@ def test(model, criterion, loader, device, return_classes=False):
         pred_labels.append(y_pred.argmax(dim=1).cpu().numpy())
 
         y_pred_distribution = torch.nn.functional.softmax(y_pred)
-        pred_distributions.append(y_pred_distribution.squeeze(0).cpu().numpy())
-        #print(y_pred_distribution.shape, pred_distributions)
+        pred_class_distributions.append(y_pred_distribution.squeeze(0).cpu().numpy())
+        #print(y_pred_distribution.shape, pred_class_distributions)
         
         loss = criterion(y_pred, y_true.to(device))
         losses.append(loss.item())
@@ -79,42 +79,52 @@ def test(model, criterion, loader, device, return_classes=False):
         #break
 
         
-    metrics = get_metrics(true_labels, pred_labels, true_onehot_distributions, pred_distributions, return_classes)
-    loss = np.mean(losses)
-    return loss, metrics
+    # metrics = get_metrics(true_labels, pred_labels, true_onehot_distributions, pred_class_distributions, return_classes)
+    # loss = np.mean(losses)
+
+    return {"loss": np.mean(losses),
+            "true_labels": true_labels,
+            "pred_labels": pred_labels,
+            "true_onehot_distributions": true_onehot_distributions,
+            "pred_class_distributions": pred_class_distributions}
 
 
-def get_metrics(target_classes, pred_classes, true_onehot_distributions, pred_distributions, return_classes=False):
-    from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score, confusion_matrix
-    acc = accuracy_score(target_classes, pred_classes)
-    precision = precision_score(target_classes, pred_classes, average="micro")
-    recall = recall_score(target_classes, pred_classes, average="micro")
-    f1 = f1_score(target_classes, pred_classes, average="micro")
-    roc_auc = roc_auc_score(true_onehot_distributions, pred_distributions, average="micro", multi_class="ovr")
-    cm = confusion_matrix(target_classes, pred_classes)
+# def get_metrics(target_classes, pred_classes, true_onehot_distributions, pred_class_distributions, return_classes=False):
+#     from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score, confusion_matrix
+#     acc = accuracy_score(target_classes, pred_classes)
+#     precision = precision_score(target_classes, pred_classes, average="micro")
+#     recall = recall_score(target_classes, pred_classes, average="micro")
+#     f1 = f1_score(target_classes, pred_classes, average="micro")
+#     roc_auc = roc_auc_score(true_onehot_distributions, pred_class_distributions, average="micro", multi_class="ovr")
+#     cm = confusion_matrix(target_classes, pred_classes)
     
-    out = {"acc": acc, "precision": precision, "recall": recall, 
-           "f1": f1, "roc_auc": roc_auc, "cm": cm}
+#     out = {"acc": acc, 
+#            "precision": precision, 
+#            "recall": recall, 
+#            "f1": f1, 
+#            "roc_auc": roc_auc, 
+#            "cm": cm}
         
-    if return_classes: 
-        out["pred_classes"] = pred_classes
-        out["target_classes"] = target_classes
-    return out
+#     if return_classes: 
+#         out["pred_classes"] = pred_classes
+#         out["target_classes"] = target_classes
+#     return out
 
 # evaluating validation set
 val_data_file_path="data/splits/val_4458.txt"
 val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(val_loader)}")
-val_loss, metrics = test(model, criterion, val_loader, device, return_classes=False)
-print(f"Val: {val_loss}, {metrics}")
-Utils.save_as_pickle(metrics["cm"], "outputs/images/val_cm.pkl")
+metrics = test(model, criterion, val_loader, device, return_classes=False)
+print(f"Val: {metrics}")
+Utils.save_as_pickle(metrics, "outputs/images/val_cm.pkl")
+
 
 # evaluating test set
 test_data_file_path="data/splits/test_5862.txt"
 test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(test_loader)}")
-test_loss, metrics = test(model, criterion, test_loader, device, return_classes=False)
-print(f"Test: {test_loss}, {metrics}")
-Utils.save_as_pickle(metrics["cm"], "outputs/images/test_cm.pkl")
+metrics = test(model, criterion, test_loader, device, return_classes=False)
+print(f"Test: {metrics}")
+Utils.save_as_pickle(metrics, "outputs/images/test_cm.pkl")
