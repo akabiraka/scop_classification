@@ -53,8 +53,8 @@ model.load_state_dict(checkpoint['model_state_dict'])
 @torch.no_grad()
 def test(model, criterion, loader, device, return_classes=False):
     model.eval()
-    losses, pred_labels, true_labels = [], [], []
-    pred_class_distributions, true_onehot_distributions = [], []
+    losses, true_labels, pred_class_distributions = [], [], []
+    
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
@@ -62,13 +62,7 @@ def test(model, criterion, loader, device, return_classes=False):
 
         true_labels.append(y_true.cpu().numpy())
         
-        y_true_onehot = torch.nn.functional.one_hot(y_true, num_classes=n_classes)
-        true_onehot_distributions.append(y_true_onehot.squeeze(0).cpu().numpy())
-        #print(y_true_onehot.shape, true_onehot_distributions)
-        
         y_pred = model(x, key_padding_mask, attn_mask)
-        pred_labels.append(y_pred.argmax(dim=1).cpu().numpy())
-
         y_pred_distribution = torch.nn.functional.softmax(y_pred)
         pred_class_distributions.append(y_pred_distribution.squeeze(0).cpu().numpy())
         #print(y_pred_distribution.shape, pred_class_distributions)
@@ -84,8 +78,6 @@ def test(model, criterion, loader, device, return_classes=False):
 
     return {"loss": np.mean(losses),
             "true_labels": true_labels,
-            "pred_labels": pred_labels,
-            "true_onehot_distributions": true_onehot_distributions,
             "pred_class_distributions": pred_class_distributions}
 
 
