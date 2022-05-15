@@ -50,7 +50,7 @@ model.load_state_dict(checkpoint['model_state_dict'])
 
 
 @torch.no_grad()
-def test(model, criterion, loader, device):
+def test(model, criterion, loader, device, return_classes=False):
     model.eval()
     losses, pred_labels, true_labels = [], [], []
     for i, (data, y_true) in enumerate(loader):
@@ -64,28 +64,32 @@ def test(model, criterion, loader, device):
         pred_labels.append(y_pred.argmax(dim=1).cpu().numpy())
         true_labels.append(y_true.cpu().numpy())
         
-    metrics = get_metrics(true_labels, pred_labels)
+    metrics = get_metrics(true_labels, pred_labels, return_classes)
     loss = np.mean(losses)
     return loss, metrics
 
 
-def get_metrics(target_classes, pred_classes):
-    from sklearn.metrics import accuracy_score, recall_score, precision_score
+def get_metrics(target_classes, pred_classes, return_classes=False):
+    from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score
     acc = accuracy_score(target_classes, pred_classes)
     precision = precision_score(target_classes, pred_classes, average="micro")
     recall = recall_score(target_classes, pred_classes, average="micro")
-    return {"acc": acc, 
-            "precision": precision, 
-            "recall": recall, 
-            "pred_classes": pred_classes, 
-            "target_classes": target_classes}
+    f1 = f1_score(target_classes, pred_classes, average="micro")
+    roc_auc = roc_auc_score(target_classes, pred_classes, average="micro")
+
+    out = {"acc": acc, "precision": precision, "recall": recall, "f1": f1, "roc_auc": roc_auc}
+        
+    if return_classes: 
+        out["pred_classes"] = pred_classes
+        out["target_classes"] = target_classes
+    return out
 
 # evaluating validation set
 val_data_file_path="data/splits/val_4458.txt"
 val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(val_loader)}")
-val_loss, metrics = test(model, criterion, val_loader, device)
+val_loss, metrics = test(model, criterion, val_loader, device, return_classes=False)
 print(f"Val: {val_loss}, {metrics}")
 
 # evaluating test set
@@ -93,5 +97,5 @@ test_data_file_path="data/splits/test_5862.txt"
 test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(test_loader)}")
-test_loss, metrics = test(model, criterion, test_loader, device)
+test_loss, metrics = test(model, criterion, test_loader, device, return_classes=False)
 print(f"Test: {test_loss}, {metrics}")
