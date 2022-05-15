@@ -53,29 +53,43 @@ model.load_state_dict(checkpoint['model_state_dict'])
 def test(model, criterion, loader, device, return_classes=False):
     model.eval()
     losses, pred_labels, true_labels = [], [], []
+    pred_distributions, true_onehot_distributions = [], []
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         model.zero_grad(set_to_none=True)
-        y_pred = model(x, key_padding_mask, attn_mask)
-        loss = criterion(y_pred, y_true.to(device))
-        
-        losses.append(loss.item())
-        pred_labels.append(y_pred.argmax(dim=1).cpu().numpy())
+
         true_labels.append(y_true.cpu().numpy())
         
-    metrics = get_metrics(true_labels, pred_labels, return_classes)
+        y_true_onehot = torch.nn.functional.one_hot(y_true, num_classes=n_classes)
+        true_onehot_distributions.append(y_true_onehot.squeeze(0).cpu().numpy())
+        #print(y_true_onehot.shape, true_onehot_distributions)
+        
+        y_pred = model(x, key_padding_mask, attn_mask)
+        pred_labels.append(y_pred.argmax(dim=1).cpu().numpy())
+
+        y_pred_distribution = torch.nn.functional.softmax(y_pred)
+        pred_distributions.append(y_pred_distribution.squeeze(0).cpu().numpy())
+        #print(y_pred_distribution.shape, pred_distributions)
+        
+        loss = criterion(y_pred, y_true.to(device))
+        losses.append(loss.item())
+
+        #break
+
+        
+    metrics = get_metrics(true_labels, pred_labels, true_onehot_distributions, pred_distributions, return_classes)
     loss = np.mean(losses)
     return loss, metrics
 
 
-def get_metrics(target_classes, pred_classes, return_classes=False):
+def get_metrics(target_classes, pred_classes, true_onehot_distributions, pred_distributions, return_classes=False):
     from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score
     acc = accuracy_score(target_classes, pred_classes)
     precision = precision_score(target_classes, pred_classes, average="micro")
     recall = recall_score(target_classes, pred_classes, average="micro")
     f1 = f1_score(target_classes, pred_classes, average="micro")
-    roc_auc = roc_auc_score(target_classes, pred_classes, average="micro")
+    roc_auc = roc_auc_score(true_onehot_distributions, pred_distributions, average="micro", multi_class="ovr")
 
     out = {"acc": acc, "precision": precision, "recall": recall, "f1": f1, "roc_auc": roc_auc}
         
