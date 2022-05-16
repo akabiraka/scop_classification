@@ -157,7 +157,7 @@ class MultiheadAttentionWrapper(nn.Module):
         self.attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=batch_first)
 
     def forward(self, query, key, value, key_padding_mask=None, attn_mask=None):
-        attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask, attn_mask=attn_mask)
+        attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask)#, attn_mask=attn_mask)
         return attn_output
 
 
