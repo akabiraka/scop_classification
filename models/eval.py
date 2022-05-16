@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 # hyperparameters
 task="SF"
 max_len=512 #1024
-dim_embed=128 #512
+dim_embed=256 #512
 n_attn_heads=8 #16 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5
@@ -25,9 +25,9 @@ start_epoch=1
 include_embed_layer=True
 attn_type="contactmap" #contactmap, nobackbone, longrange
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
-out_filename = f"NoAttnMask_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
+out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
 print(out_filename)
-# NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda
+# Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda
 
 
 all_data_file_path="data/splits/all_cleaned.txt"
