@@ -83,7 +83,7 @@ val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(val_loader)}")
 metrics = test(model, criterion, val_loader, device)
 print(f"Val: {metrics}")
-Utils.save_as_pickle(metrics, "outputs/predictions/{out_filename}_val_result.pkl")
+Utils.save_as_pickle(metrics, f"outputs/predictions/{out_filename}_val_result.pkl")
 
 
 # evaluating test set
@@ -93,4 +93,4 @@ test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(test_loader)}")
 metrics = test(model, criterion, test_loader, device)
 print(f"Test: {metrics}")
-Utils.save_as_pickle(metrics, "outputs/predictions/{out_filename}_test_result.pkl")
+Utils.save_as_pickle(metrics, f"outputs/predictions/{out_filename}_test_result.pkl")
