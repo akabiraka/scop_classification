@@ -46,13 +46,15 @@ class SCOPDataset(Dataset):
             contact_map = np.where((dist_matrix>4.0) & (dist_matrix<8.0), 1, 0)
         elif self.attn_type=="contactmap":
             contact_map = np.where(dist_matrix<8.0, 1, 0)
+        elif self.attn_type=="distmap":
+            contact_map = np.where(dist_matrix==0., .3, 1/dist_matrix)
         else: 
             raise NotImplementedError("Unknown attn_type value passed.")
 
         contact_map = contact_map[:self.max_len, :self.max_len] #truncate to max_len
         attn_mask = torch.ones([self.max_len, self.max_len]) #necessary padding
         attn_mask[:contact_map.shape[0], :contact_map.shape[1]] = torch.tensor(contact_map)
-        attn_mask = torch.logical_not(attn_mask.to(dtype=torch.bool))
+        if self.attn_type!="distmap": attn_mask = torch.logical_not(attn_mask.to(dtype=torch.bool))
         attn_mask = attn_mask.repeat(self.n_attn_heads, 1, 1)
         return attn_mask
 
