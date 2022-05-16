@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_sc
 import seaborn as sn
 import matplotlib.pyplot as plt
 
-def compute_metrics(target_classes, pred_classes):
+def print_acc_prec_rec_f1_score(target_classes, pred_classes):
     acc = accuracy_score(target_classes, pred_classes)
     precision = precision_score(target_classes, pred_classes, average="weighted")
     recall = recall_score(target_classes, pred_classes, average="weighted")
@@ -15,7 +15,7 @@ def compute_metrics(target_classes, pred_classes):
     print(f"acc: {acc}, precision: {precision}, recall: {recall}, f1: {f1}")
 
 
-def compute_metrics_from_distributions(target_cls_distributions, pred_cls_distributions):
+def print_roc_auc_score(target_cls_distributions, pred_cls_distributions):
     roc_auc = roc_auc_score(target_cls_distributions, pred_cls_distributions, average="micro", multi_class="ovr")
     print(f"roc_auc: {roc_auc}")
 
@@ -27,21 +27,25 @@ def get_one_hot(labels):
     one_hot[rows, labels] = 1
     return one_hot
 
-# scp -r akabir4@argo.orc.gmu.edu:/scratch/akabir4/scop_classification/outputs/images/* outputs/images/
-result = Utils.load_pickle("outputs/predictions/test_cm.pkl")
+# scp -r akabir4@argo.orc.gmu.edu:/scratch/akabir4/scop_classification/outputs/predictions/* outputs/predictions/
 
-loss = result["loss"]
-true_labels = np.array(np.stack(result["true_labels"]))[:, 0]
-pred_class_distributions = np.stack(result["pred_class_distributions"])
+# for fname in ["Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_test_result"]:
+# for fname in ["NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_val_result", "NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_test_result"]:    
+for fname in ["Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_test_result"]:        
+    result = Utils.load_pickle(f"outputs/predictions/{fname}.pkl")
 
-target_class_distributions = get_one_hot(true_labels)
-pred_labels = np.argmax(pred_class_distributions, axis=1)
+    loss = result["loss"]
+    true_labels = np.array(np.stack(result["true_labels"]))[:, 0]
+    pred_class_distributions = np.stack(result["pred_class_distributions"])
 
-print(loss, true_labels.shape, pred_class_distributions.shape, pred_labels.shape)
+    target_class_distributions = get_one_hot(true_labels)
+    pred_labels = np.argmax(pred_class_distributions, axis=1)
 
-compute_metrics(true_labels, pred_labels)
+    print(loss, true_labels.shape, pred_class_distributions.shape, pred_labels.shape)
 
-compute_metrics_from_distributions(target_class_distributions, pred_class_distributions)
+    print_acc_prec_rec_f1_score(true_labels, pred_labels)
+
+    print_roc_auc_score(target_class_distributions, pred_class_distributions)
 
 # cm = confusion_matrix(true_labels, pred_labels)
 # print(cm.shape)
