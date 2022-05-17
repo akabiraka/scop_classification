@@ -152,18 +152,22 @@ class EncoderDecoder(nn.Module):
         return x
 
 class MultiheadAttentionWrapper(nn.Module):
-    def __init__(self, dim_embed, n_attn_heads, batch_first=True) -> None:
+    def __init__(self, dim_embed, n_attn_heads, batch_first=True, apply_attn_mask=True) -> None:
         super(MultiheadAttentionWrapper, self).__init__()
         self.attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=batch_first)
+        self.apply_attn_mask = apply_attn_mask
 
     def forward(self, query, key, value, key_padding_mask=None, attn_mask=None):
-        attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask, attn_mask=attn_mask)
+        if self.apply_attn_mask:
+            attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask, attn_mask=attn_mask)
+        else: 
+            attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask)
         return attn_output
 
 
-def build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2, include_embed_layer=False):
+def build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2, include_embed_layer=False, apply_attn_mask=True):
     cp = copy.deepcopy
-    attn = MultiheadAttentionWrapper(dim_embed, n_attn_heads, batch_first=True)
+    attn = MultiheadAttentionWrapper(dim_embed, n_attn_heads, batch_first=True, apply_attn_mask=apply_attn_mask)
     ff = PositionwiseFeedForward(dim_embed, dim_ff, dropout)
     enc = Encoder(EncoderLayer(dim_embed, cp(attn), cp(ff), dropout), n_encoder_layers)
     classifier = Classification(dim_embed, n_classes, dropout) # dec = PairwiseDistanceDecoder()
