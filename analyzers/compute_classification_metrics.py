@@ -9,15 +9,17 @@ import matplotlib.pyplot as plt
 
 def print_acc_prec_rec_f1_score(target_classes, pred_classes):
     acc = accuracy_score(target_classes, pred_classes)
-    precision = precision_score(target_classes, pred_classes, average="weighted")
-    recall = recall_score(target_classes, pred_classes, average="weighted")
-    f1 = f1_score(target_classes, pred_classes, average="weighted")
+    precision = precision_score(target_classes, pred_classes, average="weighted", zero_division=1)
+    recall = recall_score(target_classes, pred_classes, average="weighted", zero_division=1)
+    f1 = f1_score(target_classes, pred_classes, average="weighted", zero_division=1)
     print(f"acc: {acc}, precision: {precision}, recall: {recall}, f1: {f1}")
 
 
 def print_roc_auc_score(target_cls_distributions, pred_cls_distributions):
-    roc_auc = roc_auc_score(target_cls_distributions, pred_cls_distributions, average="micro", multi_class="ovr")
-    print(f"roc_auc: {roc_auc}")
+    roc_auc_ovr = roc_auc_score(target_cls_distributions, pred_cls_distributions, average="samples", multi_class="ovr") 
+    # ovr and ovo produce same value for average="samples"
+    # roc_auc_ovo = roc_auc_score(target_cls_distributions, pred_cls_distributions, average="samples", multi_class="ovo")
+    print(f"roc_auc_ovr: {roc_auc_ovr}")#, roc_auc_ovo: {roc_auc_ovo}")
 
 
 def get_one_hot(labels):
@@ -29,9 +31,11 @@ def get_one_hot(labels):
 
 # scp -r akabir4@argo.orc.gmu.edu:/scratch/akabir4/scop_classification/outputs/predictions/* outputs/predictions/
 
-# for fname in ["Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_test_result"]:
-# for fname in ["NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_val_result", "NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_test_result"]:    
-# for fname in ["Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_test_result"]:        
+# for all classes
+# for fname in ["CW_1e-05_64_300_cuda_val_result", "CW_1e-05_64_300_cuda_test_result"]:
+#     # for fname in ["Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_test_result"]:
+#     # for fname in ["Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_test_result"]:        
+#     # for fname in ["NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_val_result", "NoAttnMask_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda_test_result"]:    
 #     result = Utils.load_pickle(f"outputs/predictions/{fname}.pkl")
 
 #     loss = result["loss"]
@@ -43,16 +47,17 @@ def get_one_hot(labels):
 
 #     print(loss, true_labels.shape, pred_class_distributions.shape, pred_labels.shape)
 
-#     print_acc_prec_rec_f1_score(true_labels, pred_labels)
+#     # print_acc_prec_rec_f1_score(true_labels, pred_labels)
 
 #     print_roc_auc_score(target_class_distributions, pred_class_distributions)
 
-    # cm = confusion_matrix(true_labels, pred_labels)
-    # print(cm.shape)
+#     # cm = confusion_matrix(true_labels, pred_labels)
+#     # print(cm.shape)
 
-    # print(classification_report(true_labels, pred_labels))
+#     # print(classification_report(true_labels, pred_labels, zero_division=1))
+#     # break
 
-
+# for classes having less than and at least th classes
 from analyzers.idx_set_of_th import get_idx_set_and_idx_prime_set_of_th, get_refined_labels
 for fname in ["Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_val_result", "Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_test_result"]:
     result = Utils.load_pickle(f"outputs/predictions/{fname}.pkl")
