@@ -23,7 +23,7 @@ def parse_tensorboard(path, model_name=""):
             y.append(event.value)
             # plt.plot(event.step, event.value)
             # () 
-            if i==175: break
+            if i==700: break
         if "loss" in tag: plt.plot(x, y, label=model_name + " " +labels[j] + f" (best={np.min(y):.3f})")
         elif "acc" in tag: plt.plot(x, y, label=model_name + " " +labels[j] + f" (best={np.max(y):.3f})")
     plt.legend()
@@ -31,13 +31,18 @@ def parse_tensorboard(path, model_name=""):
     plt.ylabel("Cross-entropy loss/Accuracy")
     
 
-parse_tensorboard(path="outputs/tensorboard_runs/Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652397952.dgx002.orc.gmu.edu.1563475.0",
-                  model_name="Our model")   
+dir = "outputs/tensorboard_runs/"
+# parse_tensorboard(path=dir+"Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652397952.dgx002.orc.gmu.edu.1563475.0",
+#                   model_name="Topoformer") 
+
+parse_tensorboard(path=dir+"Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652371630.NODE050.orc.gmu.edu.30609.0",
+                  model_name="Topoformer")
 
 parse_tensorboard(path="outputs/tensorboard_runs/CW_1e-05_64_300_cuda/events.out.tfevents.1652220562.node056.orc.gmu.edu.8499.0",
-                  model_name="PRoBERTa")                  
+                  model_name="FT-BERT")                  
 
-img_name="our_model_vs_proberta_performance_comparison"
+img_name="ours_vs_FT-BERT_performance_comparison"
+# img_name=None
 img_format="png"
 if img_name==None: plt.show()
 else: plt.savefig(f"outputs/images/{img_name}.{img_format}", dpi=300, format=img_format, bbox_inches='tight', pad_inches=0.0)
