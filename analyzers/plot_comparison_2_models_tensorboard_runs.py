@@ -36,12 +36,12 @@ dir = "outputs/tensorboard_runs/"
 #                   model_name="Topoformer") 
 
 parse_tensorboard(path=dir+"Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652371630.NODE050.orc.gmu.edu.30609.0",
-                  model_name="Topoformer")
+                  model_name="ProToFormer")
 
 parse_tensorboard(path="outputs/tensorboard_runs/CW_1e-05_64_300_cuda/events.out.tfevents.1652220562.node056.orc.gmu.edu.8499.0",
                   model_name="FT-BERT")                  
 
-img_name="ours_vs_FT-BERT_performance_comparison"
+img_name="ProToFormer_vs_FT-BERT_performance_comparison"
 # img_name=None
 img_format="png"
 if img_name==None: plt.show()
