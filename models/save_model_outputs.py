@@ -59,9 +59,9 @@ def test(model, loader, device):
 
         # saving per item predictions
         outputs.append({
-            "y_true": y_true.squeeze(dim=1).cpu().numpy(),
-            "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1),
-            "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=1).cpu().numpy()
+            "y_true": y_true.squeeze(dim=0).cpu().numpy(),
+            "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1).squeeze(dim=0).cpu().numpy(),
+            "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=0).cpu().numpy()
         })
 
         break
