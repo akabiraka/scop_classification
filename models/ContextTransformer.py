@@ -88,10 +88,10 @@ class Classification(nn.Module):
 
         score = self.attn_linear(activation) # [batch_size, seq_len, 1]      
         weights = torch.softmax(score, dim=1) # [batch_size, seq_len, 1]
-        x = torch.sum(weights * last_hidden_state, dim=1)  # [batch_size, dim_embed]
+        last_layer_learned_rep = torch.sum(weights * last_hidden_state, dim=1)  # [batch_size, dim_embed]
 
-        out = self.classifier(x) # [batch_size, n_classes]
-        return out
+        cls_pred = self.classifier(last_layer_learned_rep) # [batch_size, n_classes]
+        return cls_pred, last_layer_learned_rep
 
 
 class Embeddings(nn.Module):
@@ -147,9 +147,9 @@ class EncoderDecoder(nn.Module):
             #print(x.shape)
         x = self.encoder(x, key_padding_mask, attn_mask)
         #print(x.shape)
-        x = self.decoder(x)
+        cls_pred, last_layer_learned_rep = self.decoder(x)
         #print(x.shape)
-        return x
+        return cls_pred, last_layer_learned_rep
 
 class MultiheadAttentionWrapper(nn.Module):
     def __init__(self, dim_embed, n_attn_heads, batch_first=True, apply_attn_mask=True) -> None:
@@ -207,7 +207,7 @@ def train(model, optimizer, criterion, train_loader, device):
         attn_mask = torch.cat([i for i in attn_mask])
         # print(x.shape, key_padding_mask.shape, attn_mask.shape)
         model.zero_grad(set_to_none=True)
-        y_pred = model(x, key_padding_mask, attn_mask)
+        y_pred, last_layer_learned_rep = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss.backward()
         optimizer.step()
@@ -228,7 +228,7 @@ def test(model, criterion, loader, device):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         model.zero_grad(set_to_none=True)
-        y_pred = model(x, key_padding_mask, attn_mask)
+        y_pred, last_layer_learned_rep = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         
         losses.append(loss.item())
