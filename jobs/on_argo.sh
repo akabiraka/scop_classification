@@ -20,5 +20,6 @@
 ##SBATCH --time=1-24:00
 
 ##nvidia-smi
-python models/train_test.py
+##python models/train_test.py
 ##python models/eval.py
+python models/save_model_outputs.py
