@@ -64,7 +64,7 @@ def test(model, loader, device):
             "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=0).cpu().numpy()
         })
 
-        break
+        # break
 
     return outputs
 
@@ -75,14 +75,13 @@ val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, ma
 val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(val_loader)}")
 outputs = test(model, val_loader, device)
-print(outputs)
 Utils.save_as_pickle(outputs, f"outputs/predictions/{out_filename}_outputs_on_val.pkl")
 
 
 # evaluating test set
-# test_data_file_path="data/splits/test_5862.txt"
-# test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
-# test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-# print(f"val data: {len(test_loader)}")
-# outputs = test(model, test_loader, device)
-# Utils.save_as_pickle(outputs, f"outputs/predictions/{out_filename}_outputs_on_val.pkl")
+test_data_file_path="data/splits/test_5862.txt"
+test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
+test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+print(f"val data: {len(test_loader)}")
+outputs = test(model, test_loader, device)
+Utils.save_as_pickle(outputs, f"outputs/predictions/{out_filename}_outputs_on_test.pkl")
