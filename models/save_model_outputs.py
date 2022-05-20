@@ -58,15 +58,10 @@ def test(model, loader, device):
         y_pred, last_layer_learned_rep = model(x, key_padding_mask, attn_mask)
 
         # saving per item predictions
-        print(torch.nn.functional.softmax(y_pred))
-        print(torch.nn.functional.softmax(y_pred).shape)
-        print(torch.nn.functional.softmax(y_pred, dim=1).shape)
-        print(torch.nn.functional.softmax(y_pred, dim=1))
-
         outputs.append({
-            "y_true": y_true.unsqueeze().cpu().numpy(),
-            "y_pred_distribution": torch.nn.functional.softmax(y_pred),
-            "last_layer_learned_rep": last_layer_learned_rep.unsqueeze().cpu().numpy()
+            "y_true": y_true.squeeze(dim=1).cpu().numpy(),
+            "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1),
+            "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=1).cpu().numpy()
         })
 
         break
