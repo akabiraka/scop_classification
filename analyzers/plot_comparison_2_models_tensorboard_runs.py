@@ -14,8 +14,8 @@ def parse_tensorboard(path, model_name=""):
     # make sure the scalars are in the event accumulator tags
     # print(ea.Tags()["scalars"]) # shows the tags
     
-    labels=["Train loss", "Val loss", "Val accuracy"]
-    for j, tag in enumerate(["train loss", "val loss", "acc"]):
+    labels=["train loss"]#, "Val loss", "Val accuracy"]
+    for j, tag in enumerate(["train loss"]):#, "val loss", "acc"]):
         x, y=[],[]
         for i, event in enumerate(ea.Scalars(tag)):
             # print(event.step, event.value)
@@ -28,20 +28,22 @@ def parse_tensorboard(path, model_name=""):
         elif "acc" in tag: plt.plot(x, y, label=model_name + " " +labels[j] + f" (best={np.max(y):.3f})")
     plt.legend()
     plt.xlabel("Number of epochs")
-    plt.ylabel("Cross-entropy loss/Accuracy")
+    plt.ylabel("Cross-entropy")
     
 
 dir = "outputs/tensorboard_runs/"
 # parse_tensorboard(path=dir+"Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652397952.dgx002.orc.gmu.edu.1563475.0",
 #                   model_name="Topoformer") 
 
+parse_tensorboard(path="outputs/tensorboard_runs/CW_1e-05_64_300_cuda/events.out.tfevents.1652220562.node056.orc.gmu.edu.8499.0",
+                  model_name="FT-PRoBERTa")
+                  
 parse_tensorboard(path=dir+"Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652371630.NODE050.orc.gmu.edu.30609.0",
                   model_name="ProToFormer")
 
-parse_tensorboard(path="outputs/tensorboard_runs/CW_1e-05_64_300_cuda/events.out.tfevents.1652220562.node056.orc.gmu.edu.8499.0",
-                  model_name="FT-BERT")                  
+                  
 
-img_name="ProToFormer_vs_FT-BERT_performance_comparison"
+img_name="ProToFormer_vs_FT-PRoBERTa_performance_comparison"
 # img_name=None
 img_format="png"
 if img_name==None: plt.show()
