@@ -32,7 +32,7 @@ paths = [dir+"CW_1e-05_64_300_cuda/events.out.tfevents.1652220562.node056.orc.gm
         dir+"Model1_contactmap_SF_512_128_8_512_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652397952.dgx002.orc.gmu.edu.1563475.0",
         dir+"Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda/events.out.tfevents.1652371630.NODE050.orc.gmu.edu.30609.0"]
 
-model_names = ["FT-PRoBERTa", "ProToFormer (seq+128)", "ProToFormer (seq+128+CM)", "ProToFormer (seq+256+CM)"]
+model_names = ["FT-PRoBERTa", "ProToFormer (128-SEQ)", "ProToFormer (128-SEQ+CM)", "ProToFormer (256-SEQ+CM)"]
 
 tags = ["train loss", "val loss", "acc"]
 y_labels = ["Cross-entropy", "Cross-entropy", "Accuracy"]

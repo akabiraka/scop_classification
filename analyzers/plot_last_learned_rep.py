@@ -96,7 +96,7 @@ ax.set_xlabel('Component-one')
 ax.set_ylabel('Component-two')
 ax.grid(True)
 # ax.legend()
-ax.legend(bbox_to_anchor=(0, -.1), loc='upper left', ncol=1)
+ax.legend(bbox_to_anchor=(.5, 1.6), loc='upper center', ncol=1)
 
 # plt.show()
 plt.savefig(f"outputs/images/colocalization_of_classes.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.0)
