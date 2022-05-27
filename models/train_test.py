@@ -25,9 +25,9 @@ n_epochs=1000 #1000
 batch_size=64 #64
 start_epoch=1
 include_embed_layer=True
-attn_type="contactmap" #contactmap, nobackbone, longrange, distmap, noattnmask
+attn_type="nobackbone" #contactmap, nobackbone, longrange, distmap, noattnmask
 apply_attn_mask=False if attn_type=="noattnmask" else True
-apply_neighbor_aggregation=True
+apply_neighbor_aggregation=False
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
 out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}_{apply_neighbor_aggregation}"
 print(out_filename)

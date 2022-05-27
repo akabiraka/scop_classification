@@ -42,8 +42,10 @@ class SCOPDataset(Dataset):
     def get_attn_mask(self, dist_matrix):
         if self.attn_type=="nobackbone": 
             contact_map = np.where((dist_matrix>1.0) & (dist_matrix<8.0), 1, 0)
+            contact_map.fill_diagonal_(1) #do self attention
         elif self.attn_type=="longrange": 
             contact_map = np.where((dist_matrix>4.0) & (dist_matrix<8.0), 1, 0)
+            contact_map.fill_diagonal_(1) #do self attention
         elif self.attn_type=="contactmap" or self.attn_type=="noattnmask":
             contact_map = np.where(dist_matrix<8.0, 1, 0)
         elif self.attn_type=="distmap":
