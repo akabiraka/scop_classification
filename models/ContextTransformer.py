@@ -1,5 +1,4 @@
 import sys
-from turtle import forward
 sys.path.append("../scop_classification")
 import torch
 import torch.nn as nn
@@ -155,13 +154,15 @@ class MultiheadAttentionWrapper(nn.Module):
     def __init__(self, dim_embed, n_attn_heads, batch_first=True, apply_attn_mask=True, apply_neighbor_aggregation=False) -> None:
         super(MultiheadAttentionWrapper, self).__init__()
         self.attn = nn.MultiheadAttention(dim_embed, n_attn_heads, batch_first=batch_first)
+        self.n_attn_heads = n_attn_heads
         self.apply_attn_mask = apply_attn_mask
         self.apply_neighbor_aggregation = apply_neighbor_aggregation
-
+    
     def forward(self, query, key, value, key_padding_mask=None, attn_mask=None):
         if self.apply_attn_mask and self.apply_neighbor_aggregation:
             attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask, attn_mask=attn_mask)
-            attn_output = torch.matmul(attn_mask, attn_output) #neighborhood aggregatioon
+            #print(attn_output.dtype, attn_weights.dtype, attn_mask[range(0, attn_mask.shape[0], self.n_attn_heads), :, :].to(dtype=torch.float32).dtype)
+            attn_output = torch.matmul(attn_mask[range(0, attn_mask.shape[0], self.n_attn_heads), :, :].to(dtype=torch.float32), attn_output) #neighborhood aggregation
         
         elif self.apply_attn_mask:
             attn_output, attn_weights = self.attn(query, key, value, key_padding_mask=key_padding_mask, attn_mask=attn_mask)
