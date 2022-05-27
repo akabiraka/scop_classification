@@ -42,10 +42,10 @@ class SCOPDataset(Dataset):
     def get_attn_mask(self, dist_matrix):
         if self.attn_type=="nobackbone": 
             contact_map = np.where((dist_matrix>1.0) & (dist_matrix<8.0), 1, 0)
-            contact_map.fill_diagonal_(1) #do self attention
+            np.fill_diagonal(contact_map, 1) #do self attention
         elif self.attn_type=="longrange": 
             contact_map = np.where((dist_matrix>4.0) & (dist_matrix<8.0), 1, 0)
-            contact_map.fill_diagonal_(1) #do self attention
+            np.fill_diagonal(contact_map, 1) #do self attention
         elif self.attn_type=="contactmap" or self.attn_type=="noattnmask":
             contact_map = np.where(dist_matrix<8.0, 1, 0)
         elif self.attn_type=="distmap":
@@ -53,6 +53,8 @@ class SCOPDataset(Dataset):
         else: 
             raise NotImplementedError("Unknown attn_type value passed.")
 
+
+        #print(contact_map)
         contact_map = contact_map[:self.max_len, :self.max_len] #truncate to max_len
         attn_mask = torch.ones([self.max_len, self.max_len]) #necessary padding
         attn_mask[:contact_map.shape[0], :contact_map.shape[1]] = torch.tensor(contact_map)
