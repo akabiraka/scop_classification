@@ -20,15 +20,16 @@ n_attn_heads=8 #8 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5 #5
 dropout=0.1
-init_lr=1e-5
+init_lr=1e-4
 n_epochs=1000 #1000 
 batch_size=64 #64
 start_epoch=1
 include_embed_layer=True
 attn_type="noattnmask" #contactmap, nobackbone, longrange, distmap, noattnmask
 apply_attn_mask=False if attn_type=="noattnmask" else True
+apply_neighbor_aggregation=True
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
-out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"
+out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}_{apply_neighbor_aggregation}"
 print(out_filename)
 
 
@@ -55,7 +56,7 @@ class_weights = torch.tensor(class_weights, dtype=torch.float, device=device)
 print(f"class_weights: {class_weights}")
 
 # model
-model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer, apply_attn_mask)
+model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer, apply_attn_mask, apply_neighbor_aggregation)
 model.to(device)
 trainable = ContextTransformer.count_parameters(model)
 print(f"trainable weights: {trainable}")
@@ -72,19 +73,6 @@ train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"train batches: {len(train_loader)}, val batches: {len(val_loader)}")
 
-# load the AUC/loss based model checkpoint 
-# if os.path.exists(f"outputs/models/{out_filename}.pth"):
-#     checkpoint = torch.load(f"outputs/models/{out_filename}.pth")
-#     model.load_state_dict(checkpoint['model_state_dict'])
-#     prev_n_epochs = checkpoint['epoch']
-#     print(f"Previously trained for {prev_n_epochs} number of epochs...")
-    
-#     # train for more epochs with new lr
-#     start_epoch = prev_n_epochs+1
-#     n_epochs = 1000
-#     new_lr=1e-4
-#     optimizer = torch.optim.Adam(model.parameters(), lr=new_lr, weight_decay=0.01)
-#     print(f"Train for {n_epochs} more epochs...")
 
 best_loss = np.inf
 for epoch in range(start_epoch, n_epochs+start_epoch):
