@@ -67,23 +67,15 @@ class EncoderLayer(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, layer, N, return_attn_weights=True):
+    def __init__(self, layer, N):
         super(Encoder, self).__init__()
         self.layers = clones(layer, N)
         self.norm = nn.LayerNorm(layer.dim_embed)
-        self.return_attn_weights = return_attn_weights
         
-    def forward(self, x, key_padding_mask, attn_mask):
-
-        # do not keep and return the attention weights
-        if not self.return_attn_weights:
-            for i, layer in enumerate(self.layers):
-                x, attn_weights = layer(x, key_padding_mask, attn_mask)
-            return self.norm(x), None 
-            # None b.c. of storing such amount of data does not make sense 
+    def forward(self, x, key_padding_mask, attn_mask, return_attn_weights=False):
         
         # store and return the attention weights for all layers and heads
-        else:
+        if return_attn_weights:
             all_layers_attn_weights = []
             for i, layer in enumerate(self.layers):
                 x, attn_weights = layer(x, key_padding_mask, attn_mask)
@@ -92,6 +84,13 @@ class Encoder(nn.Module):
             all_layers_attn_weights = torch.stack(all_layers_attn_weights, dim=0)
             # print(all_layers_attn_weights.shape) #[n_layers, batch_size, n_heads, max_len, max_len]
             return self.norm(x), all_layers_attn_weights
+        
+        # do not keep and return the attention weights
+        else:
+            for i, layer in enumerate(self.layers):
+                x, _ = layer(x, key_padding_mask, attn_mask)
+            return self.norm(x), None 
+            # None b.c. of storing such amount of data does not make sense 
 
 
 class PairwiseDistanceDecoder(nn.Module):
@@ -186,7 +185,7 @@ class EncoderDecoder(nn.Module):
     def get_all_layers_attn_weights(self, x, key_padding_mask, attn_mask):
         """This also returns embeddings to avaid extra computation."""
         x = self.embed_layer(x)
-        _, all_layers_attn_weights = self.encoder(x, key_padding_mask, attn_mask)
+        _, all_layers_attn_weights = self.encoder(x, key_padding_mask, attn_mask, return_attn_weights=True)
         return all_layers_attn_weights
 
     def get_last_layer_learned_rep(self, x, key_padding_mask, attn_mask):
@@ -228,11 +227,11 @@ class MultiheadAttentionWrapper(nn.Module):
 
 
 def build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout=0.2, 
-                include_embed_layer=False, apply_attn_mask=True, apply_neighbor_aggregation=False, return_attn_weights=False):
+                include_embed_layer=False, apply_attn_mask=True, apply_neighbor_aggregation=False):
     cp = copy.deepcopy
     attn = MultiheadAttentionWrapper(dim_embed, n_attn_heads, batch_first=True, apply_attn_mask=apply_attn_mask, apply_neighbor_aggregation=apply_neighbor_aggregation)
     ff = PositionwiseFeedForward(dim_embed, dim_ff, dropout)
-    enc = Encoder(EncoderLayer(dim_embed, cp(attn), cp(ff), dropout), n_encoder_layers, return_attn_weights)
+    enc = Encoder(EncoderLayer(dim_embed, cp(attn), cp(ff), dropout), n_encoder_layers)
     classifier = Classification(dim_embed, n_classes, dropout) # dec = PairwiseDistanceDecoder()
     model = EncoderDecoder(enc, classifier, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, max_len, include_embed_layer)
 

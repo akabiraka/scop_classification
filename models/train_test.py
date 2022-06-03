@@ -28,7 +28,6 @@ include_embed_layer=True
 attn_type="nobackbone" #contactmap, nobackbone, longrange, distmap, noattnmask
 apply_attn_mask=False if attn_type=="noattnmask" else True
 apply_neighbor_aggregation=False
-return_attn_weights=False
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
 out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}_{apply_neighbor_aggregation}"
 print(out_filename)
@@ -57,7 +56,7 @@ class_weights = torch.tensor(class_weights, dtype=torch.float, device=device)
 print(f"class_weights: {class_weights}")
 
 # model
-model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer, apply_attn_mask, apply_neighbor_aggregation, return_attn_weights)
+model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer, apply_attn_mask, apply_neighbor_aggregation)
 model.to(device)
 trainable = ContextTransformer.count_parameters(model)
 print(f"trainable weights: {trainable}")

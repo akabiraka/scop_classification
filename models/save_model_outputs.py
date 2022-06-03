@@ -26,7 +26,6 @@ include_embed_layer=True
 attn_type="distmap" #contactmap, nobackbone, longrange, distmap, noattnmask
 apply_attn_mask=False if attn_type=="noattnmask" else True
 apply_neighbor_aggregation=False
-return_attn_weights=True
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
 out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"#_{apply_neighbor_aggregation}"
 print(out_filename)
@@ -54,7 +53,7 @@ n_classes = len(class_dict)
 print(f"n_classes: {n_classes}")
 
 # model
-model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer, apply_attn_mask, apply_neighbor_aggregation, return_attn_weights)
+model = ContextTransformer.build_model(max_len, dim_embed, dim_ff, n_attn_heads, n_encoder_layers, n_classes, dropout, include_embed_layer, apply_attn_mask, apply_neighbor_aggregation)
 model.to(device)
 
 # loading learned weights
@@ -75,21 +74,22 @@ def test(model, loader, device, thing_to_save):
         model.zero_grad(set_to_none=True)
 
         
-        if thing_to_save=="y_pred_distribution":
-            y_pred = model(x, key_padding_mask, attn_mask)
-            outputs.append({
-                "y_true": y_true.squeeze(dim=0).cpu().numpy(), #scaler
-                "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1).squeeze(dim=0).cpu().numpy() #[n_classes]
-            })
+        # if thing_to_save=="y_pred_distribution":
+        #     y_pred = model(x, key_padding_mask, attn_mask)
+        #     outputs.append({
+        #         "y_true": y_true.squeeze(dim=0).cpu().numpy(), #scaler
+        #         "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1).squeeze(dim=0).cpu().numpy() #[n_classes]
+        #     })
             
-        elif thing_to_save=="last_layer_learned_rep":
-            last_layer_learned_rep = model.get_last_layer_learned_rep(x, key_padding_mask, attn_mask)
-            outputs.append({
-                "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=0).cpu().numpy() #[]
-            })
+        # elif thing_to_save=="last_layer_learned_rep":
+        #     last_layer_learned_rep = model.get_last_layer_learned_rep(x, key_padding_mask, attn_mask)
+        #     outputs.append({
+        #         "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=0).cpu().numpy() #[]
+        #     })
 
-        elif thing_to_save=="all_layers_attn_weights":
+        if thing_to_save=="all_layers_attn_weights":
             all_layers_attn_weights = model.get_all_layers_attn_weights(x, key_padding_mask, attn_mask)
+            print(all_layers_attn_weights.shape)
             outputs.append({
                 "all_layers_attn_weights": all_layers_attn_weights.squeeze(dim=1).cpu().numpy(), #[n_encoder_layers, n_attn_heads, max_len, max_len]
             })
