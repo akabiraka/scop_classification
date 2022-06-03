@@ -33,8 +33,16 @@ out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{
 print(out_filename)
 # LocalModel_nobackbone_SF_512_32_8_128_5_0.1_0.0001_1000_16_True_cuda_False
 
-# all_data_file_path="data/splits/debug/all_cleaned.txt" #for debugging purpose
+# debugging file paths
+# all_data_file_path="data/splits/debug/all_cleaned.txt" 
+# val_data_file_path="data/splits/debug/val_14.txt" 
+# test_data_file_path="data/splits/debug/test_16.txt"
+
+# real file paths
 all_data_file_path="data/splits/all_cleaned.txt"
+val_data_file_path="data/splits/val_4458.txt"
+test_data_file_path="data/splits/test_5862.txt"
+
 # generating class dictionary
 df = pd.read_csv(all_data_file_path)
 x = df[task].unique().tolist()
@@ -58,16 +66,20 @@ def test(model, loader, device):
     for i, (data, y_true) in enumerate(loader):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
-        
         model.zero_grad(set_to_none=True)
-        y_pred, last_layer_learned_rep, all_layers_attn_weights, embeddings = model(x, key_padding_mask, attn_mask)
-        # print(embeddings.shape)
+
+        # y_pred = model(x, key_padding_mask, attn_mask)
+        # embeddings = model.get_embeddings(x)
+        # all_layers_attn_weights, _ = model.get_all_layers_attn_weights(x, key_padding_mask, attn_mask)
+        # last_layer_learned_rep, _, _ = model.get_last_layer_learned_rep(x, key_padding_mask, attn_mask)
+        y_pred, last_layer_learned_rep, all_layers_attn_weights, embeddings = model.get_all(x, key_padding_mask, attn_mask)
+        print(y_true.shape, y_pred.shape, embeddings.shape, all_layers_attn_weights.shape, last_layer_learned_rep.shape)
 
         # saving per item predictions
         outputs.append({
-            "y_true": y_true.squeeze(dim=0).cpu().numpy(),
-            "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1).squeeze(dim=0).cpu().numpy(),
-            "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=0).cpu().numpy(),
+            "y_true": y_true.squeeze(dim=0).cpu().numpy(), #scaler
+            "y_pred_distribution": torch.nn.functional.softmax(y_pred, dim=1).squeeze(dim=0).cpu().numpy(), #[n_classes]
+            "last_layer_learned_rep": last_layer_learned_rep.squeeze(dim=0).cpu().numpy(), #[]
             "all_layers_attn_weights": all_layers_attn_weights.squeeze(dim=1).cpu().numpy(), #[n_encoder_layers, n_attn_heads, max_len, max_len]
             "embeddings": embeddings.squeeze(dim=0).cpu().numpy() #[max_len, dim_embed]
         })
@@ -78,8 +90,6 @@ def test(model, loader, device):
 
 
 # evaluating validation set
-# val_data_file_path="data/splits/debug/val_14.txt" #for debugging purpose
-val_data_file_path="data/splits/val_4458.txt"
 val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(val_loader)}")
@@ -88,8 +98,6 @@ Utils.save_as_pickle(outputs, f"outputs/predictions/{out_filename}_outputs_on_va
 
 
 # evaluating test set
-# test_data_file_path="data/splits/debug/test_16.txt" #for debugging purpose
-test_data_file_path="data/splits/test_5862.txt"
 test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 print(f"val data: {len(test_loader)}")

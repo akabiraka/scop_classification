@@ -172,13 +172,36 @@ class EncoderDecoder(nn.Module):
     
     def forward(self, x, key_padding_mask, attn_mask):
         if self.include_embed_layer:
-            embeddings = self.embed_layer(x)
-            #print(embeddings.shape)
+            x = self.embed_layer(x)
+            #print(x.shape)
+        x, _ = self.encoder(x, key_padding_mask, attn_mask)
+        #print(x.shape)
+        cls_pred, _ = self.decoder(x)
+        #print(x.shape)
+        return cls_pred
+    
+    def get_embeddings(self, x):
+        return self.embed_layer(x)
+    
+    def get_all_layers_attn_weights(self, x, key_padding_mask, attn_mask):
+        """This also returns embeddings to avaid extra computation."""
+        embeddings = self.embed_layer(x)
+        _, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
+        return all_layers_attn_weights, embeddings
+
+    def get_last_layer_learned_rep(self, x, key_padding_mask, attn_mask):
+        """This also returns all_layers_attn_weights and embeddings to avaid extra computation."""
+        embeddings = self.embed_layer(x)
         x, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
-        #print(x.shape)
-        cls_pred, last_layer_learned_rep = self.decoder(x)
-        #print(x.shape)
-        return cls_pred, last_layer_learned_rep, all_layers_attn_weights, embeddings
+        _, last_layer_learned_rep = self.decoder(x)
+        return last_layer_learned_rep, all_layers_attn_weights, embeddings
+
+    def get_all(self, x, key_padding_mask, attn_mask):
+        embeddings = self.embed_layer(x)
+        x, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
+        y_pred, last_layer_learned_rep = self.decoder(x)
+        return y_pred, last_layer_learned_rep, all_layers_attn_weights, embeddings
+
 
 class MultiheadAttentionWrapper(nn.Module):
     def __init__(self, dim_embed, n_attn_heads, batch_first=True, apply_attn_mask=True, apply_neighbor_aggregation=False) -> None:
@@ -247,7 +270,7 @@ def train(model, optimizer, criterion, train_loader, device):
         attn_mask = torch.cat([i for i in attn_mask])
         # print(x.shape, key_padding_mask.shape, attn_mask.shape)
         model.zero_grad(set_to_none=True)
-        y_pred, _, _, _ = model(x, key_padding_mask, attn_mask)
+        y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         loss.backward()
         optimizer.step()
@@ -268,7 +291,7 @@ def test(model, criterion, loader, device):
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         model.zero_grad(set_to_none=True)
-        y_pred, _, _, _ = model(x, key_padding_mask, attn_mask)
+        y_pred = model(x, key_padding_mask, attn_mask)
         loss = criterion(y_pred, y_true.to(device))
         
         losses.append(loss.item())
