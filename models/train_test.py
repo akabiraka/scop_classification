@@ -15,14 +15,14 @@ torch.cuda.empty_cache()
 # hyperparameters
 task="SF"
 max_len=512 #512
-dim_embed=32 #256
+dim_embed=256 #256
 n_attn_heads=8 #8 #dim_embed must be divisible by num_head
 dim_ff=4*dim_embed 
 n_encoder_layers=5 #5
 dropout=0.1
 init_lr=1e-4
 n_epochs=1000 #1000 
-batch_size=16 #64
+batch_size=64 #64
 start_epoch=1
 include_embed_layer=True
 attn_type="nobackbone" #contactmap, nobackbone, longrange, distmap, noattnmask
@@ -30,17 +30,17 @@ apply_attn_mask=False if attn_type=="noattnmask" else True
 apply_neighbor_aggregation=False
 return_attn_weights=False
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
-out_filename = f"LocalModel1_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}_{apply_neighbor_aggregation}"
+out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}_{apply_neighbor_aggregation}"
 print(out_filename)
+# LocalModel_nobackbone_SF_512_32_8_128_5_0.1_0.0001_1000_16_True_cuda_False
 
+# all_data_file_path="data/splits/debug/all_cleaned.txt"
+# train_data_file_path="data/splits/debug/train_70.txt"
+# val_data_file_path="data/splits/debug/val_14.txt"
 
-all_data_file_path="data/splits/debug/all_cleaned.txt"
-train_data_file_path="data/splits/debug/train_70.txt"
-val_data_file_path="data/splits/debug/val_14.txt"
-
-# all_data_file_path="data/splits/all_cleaned.txt"
-# train_data_file_path="data/splits/train_24538.txt"
-# val_data_file_path="data/splits/val_4458.txt"
+all_data_file_path="data/splits/all_cleaned.txt"
+train_data_file_path="data/splits/train_24538.txt"
+val_data_file_path="data/splits/val_4458.txt"
 
 # generating class dictionary
 df = pd.read_csv(all_data_file_path)
