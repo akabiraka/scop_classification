@@ -185,22 +185,22 @@ class EncoderDecoder(nn.Module):
     
     def get_all_layers_attn_weights(self, x, key_padding_mask, attn_mask):
         """This also returns embeddings to avaid extra computation."""
-        embeddings = self.embed_layer(x)
-        _, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
-        return all_layers_attn_weights, embeddings
+        x = self.embed_layer(x)
+        _, all_layers_attn_weights = self.encoder(x, key_padding_mask, attn_mask)
+        return all_layers_attn_weights
 
     def get_last_layer_learned_rep(self, x, key_padding_mask, attn_mask):
         """This also returns all_layers_attn_weights and embeddings to avaid extra computation."""
-        embeddings = self.embed_layer(x)
-        x, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
+        x = self.embed_layer(x)
+        x, _ = self.encoder(x, key_padding_mask, attn_mask)
         _, last_layer_learned_rep = self.decoder(x)
-        return last_layer_learned_rep, all_layers_attn_weights, embeddings
+        return last_layer_learned_rep
 
-    def get_all(self, x, key_padding_mask, attn_mask):
-        embeddings = self.embed_layer(x)
-        x, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
-        y_pred, last_layer_learned_rep = self.decoder(x)
-        return y_pred, last_layer_learned_rep, all_layers_attn_weights, embeddings
+    # def get_all(self, x, key_padding_mask, attn_mask):
+    #     embeddings = self.embed_layer(x)
+    #     x, all_layers_attn_weights = self.encoder(embeddings, key_padding_mask, attn_mask)
+    #     y_pred, last_layer_learned_rep = self.decoder(x)
+    #     return y_pred, last_layer_learned_rep, all_layers_attn_weights, embeddings
 
 
 class MultiheadAttentionWrapper(nn.Module):
