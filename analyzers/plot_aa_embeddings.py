@@ -60,8 +60,8 @@ color_names = ["blue", "orange", "green", "red", "purple", "brown", "pink", "gra
 
 
 for i, (data, y_true) in enumerate(loader):
-    if i!=123: continue
-    print(data["src"].shape, data["key_padding_mask"].shape, data["attn_mask"].shape) #to access data
+    # if i!=123: continue
+    print(data["src"], data["key_padding_mask"].shape, data["attn_mask"].shape) #to access data
 
     key_padding_mask = data["key_padding_mask"].squeeze(dim=0).cpu().numpy()
     seq_len = np.argmax(key_padding_mask==True)

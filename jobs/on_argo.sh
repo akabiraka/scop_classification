@@ -22,4 +22,5 @@
 ##nvidia-smi
 ##python models/train_test.py
 ##python models/eval.py
-python models/save_model_outputs.py
+##python models/save_model_outputs.py
+python models/save_20_aa_embeddings.py
