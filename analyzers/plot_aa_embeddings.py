@@ -86,4 +86,4 @@ for i, (data, y_true) in enumerate(loader):
 
     break # since we need to plot for only one sequence
 
-# scp -r akabir4@argo.orc.gmu.edu:/scratch/akabir4/scop_classification/outputs/images/aa_embedding_of_a_seq.png outputs/predictions/
+# scp -r akabir4@argo.orc.gmu.edu:/scratch/akabir4/scop_classification/outputs/images/aa_embedding_of_a_seq.png outputs/images/

@@ -96,7 +96,7 @@ def test(model, loader, device, thing_to_save, where_to_save=None):
 
 
         elif thing_to_save=="embeddings":
-            embeddings = model.get_embeddings(x)
+            embeddings = model.get_embeddings(x, return_pos_enc=True)
             outputs.append({
                 "embeddings": embeddings.squeeze(dim=0).cpu().numpy() #[max_len, dim_embed]
             })

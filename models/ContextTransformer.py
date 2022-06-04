@@ -179,8 +179,9 @@ class EncoderDecoder(nn.Module):
         #print(x.shape)
         return cls_pred
     
-    def get_embeddings(self, x):
-        return self.embed_layer(x)
+    def get_embeddings(self, x, return_pos_enc=False):
+        if return_pos_enc: return self.embed_layer(0)
+        else: return self.embed_layer.__getitem__(0)(x)
     
     def get_all_layers_attn_weights(self, x, key_padding_mask, attn_mask):
         """This also returns embeddings to avaid extra computation."""
