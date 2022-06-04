@@ -4,6 +4,7 @@ sys.path.append("../scop_classification")
 import numpy as np
 import pandas as pd
 import utils as Utils
+import matplotlib.pyplot as plt
 from features import static as STATIC
 from models.SCOPDataset import SCOPDataset
 from torch.utils.data import DataLoader
@@ -21,13 +22,13 @@ def compute_tsne(features):
 
 # necessary directory configs
 # debug set
-all_data_file_path="data/splits/debug/all_cleaned.txt"
-data_file_path="data/splits/debug/val_14.txt" 
-model_outputs_file_path="outputs/predictions/LocalModel_nobackbone_SF_512_32_8_128_5_0.1_0.0001_1000_16_True_cuda_False_outputs_on_val.pkl"
+# all_data_file_path="data/splits/debug/all_cleaned.txt"
+# data_file_path="data/splits/debug/val_14.txt" 
+# model_outputs_file_path="outputs/predictions/LocalModel_nobackbone_SF_512_32_8_128_5_0.1_0.0001_1000_16_True_cuda_False/val_embeddings.pkl"
 # real set
-# all_data_file_path="data/splits/all_cleaned.txt"
-# val_data_file_path="data/splits/val_4458.txt"
-# model_outputs_file_path=""
+all_data_file_path="data/splits/all_cleaned.txt"
+data_file_path="data/splits/val_4458.txt"
+model_outputs_file_path="outputs/predictions/Model_nobackbone_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_False/val_embeddings.pkl"
 
 
 
@@ -59,23 +60,25 @@ color_names = ["blue", "orange", "green", "red", "purple", "brown", "pink", "gra
 
 
 for i, (data, y_true) in enumerate(loader):
+    if i!=123: continue
     print(data["src"].shape, data["key_padding_mask"].shape, data["attn_mask"].shape) #to access data
 
     key_padding_mask = data["key_padding_mask"].squeeze(dim=0).cpu().numpy()
     seq_len = np.argmax(key_padding_mask==True)
+    print(f"seq-len: {seq_len}")
 
-    embeddings = model_outputs[0]["embeddings"][:seq_len]
+    embeddings = model_outputs[i]["embeddings"][:seq_len]
     print(embeddings.shape)
     tsne_one, tsne_two = compute_tsne(embeddings)
     src = data["src"].squeeze(0).cpu().numpy()[:seq_len]
     
     # plotting
     for aa_idx in range(1, 21):
-        indices = [i for i, x in enumerate(src) if x==aa_idx]
+        indices = [j for j, x in enumerate(src) if x==aa_idx]
         colors = np.repeat(color_names[aa_idx-1], len(indices))
         label=STATIC.AA_NAMES[STATIC.AA_1_LETTER[aa_idx-1]]
 
-        import matplotlib.pyplot as plt
+        
         plt.scatter(x=tsne_one[indices], y=tsne_two[indices], label=label, c=colors, marker=".", alpha=0.7) #, c=aa_idx, label=aa_idx
     plt.legend(bbox_to_anchor=(.5, 1.44), loc='upper center', ncol=3)
     # plt.show()
