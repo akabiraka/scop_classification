@@ -9,7 +9,7 @@ sys.path.append("../scop_classification")
 
 AA_1_LETTER = "ARNDCQEGHILKMFPSTWYV"
 AA_NAMES = {"A": "Alanine", "R": "Arginine", "N": "Asparagine", "D": "Aspartic acid", "C": "Cysteine", "Q": "Glutamine", "E": "Glutamic acid", "G": "Glycine", "H": "Histidine", "I": "Isoleucine",
-            "L": "Leucine", "K": "Lysine", "M": "Methionine", "F": "Phenylalanine", "P": "Proline", "S": "Serine", "T": "Threonine", "W": "Wryptophan", "Y": "Tyrosine", "V": "Valine"}
+            "L": "Leucine", "K": "Lysine", "M": "Methionine", "F": "Phenylalanine", "P": "Proline", "S": "Serine", "T": "Threonine", "W": "Tryptophan", "Y": "Tyrosine", "V": "Valine"}
 
 
 # source: taken from SCONES supplementary table s1: https://pubs.acs.org/doi/suppl/10.1021/acs.jpcb.1c04913/suppl_file/jp1c04913_si_001.pdf

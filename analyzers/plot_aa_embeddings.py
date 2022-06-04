@@ -60,7 +60,7 @@ color_names = ["blue", "orange", "green", "red", "purple", "brown", "pink", "gra
 
 
 for i, (data, y_true) in enumerate(loader):
-    # if i!=123: continue
+    if i!=163: continue #123th row is 8091833, 3PVL,A:1257-1567, seq len 311, 163 row is 8082882,4CP8,A:18-465
     print(data["src"], data["key_padding_mask"].shape, data["attn_mask"].shape) #to access data
 
     key_padding_mask = data["key_padding_mask"].squeeze(dim=0).cpu().numpy()
