@@ -54,7 +54,7 @@ print(model)
 
 x = np.zeros([1, max_len])
 x[0, :20] = range(1, 21)
-x = torch.tensor(x, dtype=torch.float32, device=device)
+x = torch.tensor(x, dtype=torch.long, device=device)
 
 embeddings = model.get_embeddings(x)
 Utils.save_as_pickle(embeddings, f"outputs/predictions/{out_filename}/20_aa_embeddings.pkl")
