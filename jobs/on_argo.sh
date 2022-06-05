@@ -12,6 +12,7 @@
 ##cpu jobs
 ##SBATCH --partition=all-HiPri
 ##SBATCH --cpus-per-task=4
+##SBATCH --mem=16000MB
 
 ##python files for CPU jobs
 ##python analyzers/plot_aa_embeddings.py
