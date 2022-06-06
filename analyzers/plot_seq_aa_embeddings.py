@@ -81,8 +81,8 @@ for i, (data, y_true) in enumerate(loader):
         
         plt.scatter(x=tsne_one[indices], y=tsne_two[indices], label=label, c=colors, marker=".", alpha=0.7) #, c=aa_idx, label=aa_idx
     plt.legend(bbox_to_anchor=(.5, 1.44), loc='upper center', ncol=3)
-    plt.set_xlabel('Component-one')
-    plt.set_ylabel('Component-two')
+    plt.xlabel('Component-one')
+    plt.ylabel('Component-two')
     plt.grid(True)
     # plt.show()
     plt.savefig(f"outputs/images/aa_embedding_of_a_seq.png", dpi=300, format="png", bbox_inches='tight', pad_inches=0.05)
