@@ -10,21 +10,21 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 ##cpu jobs
-##SBATCH --partition=all-HiPri
-##SBATCH --cpus-per-task=4
-##SBATCH --mem=16000MB
+#SBATCH --partition=all-HiPri
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16000MB
 
 ##python files for CPU jobs
-##python analyzers/plot_aa_embeddings.py
+python analyzers/plot_seq_aa_embeddings.py
 
 ##GPU jobs
-#SBATCH --partition=gpuq
-#SBATCH --gres=gpu:1
-#SBATCH --mem=32000MB
+##SBATCH --partition=gpuq
+##SBATCH --gres=gpu:1
+##SBATCH --mem=32000MB
 
 ##nvidia-smi
 ##python files for GPU jobs
 ##python models/train_test.py
 ##python models/eval.py
 ##python models/save_model_outputs.py
-python models/save_20_aa_embeddings.py
+##python models/save_20_aa_embeddings.py
