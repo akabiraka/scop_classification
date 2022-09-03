@@ -58,7 +58,7 @@ class IGenerator(object):
             return
         
         if out_file_path!=None:
-            good_df = good_df.append(df.loc[i], ignore_index=True)
+            good_df = pd.concat([good_df, df.loc[[i]]], ignore_index=True) # good_df = good_df.append(df.loc[i], ignore_index=True) # append deprecated, loc[[]] returns dataframe object
             good_df.reset_index(drop=True, inplace=True)
             good_df.to_csv(out_file_path, index=False)
 
