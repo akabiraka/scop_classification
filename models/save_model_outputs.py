@@ -23,7 +23,7 @@ n_epochs=1000 #1000
 batch_size=64 #64
 start_epoch=1
 include_embed_layer=True
-attn_type="distmap" #contactmap, nobackbone, longrange, distmap, noattnmask
+attn_type="contactmap" #contactmap, nobackbone, longrange, distmap, noattnmask
 apply_attn_mask=False if attn_type=="noattnmask" else True
 apply_neighbor_aggregation=False
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
@@ -40,6 +40,7 @@ print(out_filename)
 
 # real file paths
 all_data_file_path="data/splits/all_cleaned.txt"
+train_data_file_path="data/splits/train_24538.txt"
 val_data_file_path="data/splits/val_4458.txt"
 test_data_file_path="data/splits/test_5862.txt"
 
@@ -69,6 +70,7 @@ def test(model, loader, device, thing_to_save, where_to_save=None):
     model.eval()
     outputs = []
     for i, (data, y_true) in enumerate(loader):
+        print(i)
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
         model.zero_grad(set_to_none=True)
@@ -111,25 +113,32 @@ def test(model, loader, device, thing_to_save, where_to_save=None):
 
 
 
-things_to_save = ["y_pred_distribution", "last_layer_learned_rep", "all_layers_attn_weights", "embeddings"]
+things_to_save = ["last_layer_learned_rep"]# ["y_pred_distribution", "last_layer_learned_rep", "all_layers_attn_weights", "embeddings"]
 outputs_dir=f"outputs/predictions/{out_filename}"
 Path(outputs_dir).mkdir(parents=True, exist_ok=True)
 
 
 
 for thing_to_save in things_to_save:
-    # evaluating validation set
-    val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
-    val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
-    print(f"Computing '{thing_to_save}' for val data of size {len(val_loader)}")
-    outputs = test(model, val_loader, device, thing_to_save, where_to_save=f"{outputs_dir}/{thing_to_save}/val")
-    if outputs is not None: Utils.save_as_pickle(outputs, f"{outputs_dir}/val_{thing_to_save}.pkl")
+    # evaluating train set
+    train_dataset = SCOPDataset(train_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
+    train_loader = DataLoader(train_dataset, batch_size=1, shuffle=False)
+    print(f"Computing '{thing_to_save}' for val data of size {len(train_loader)}")
+    outputs = test(model, train_loader, device, thing_to_save, where_to_save=f"{outputs_dir}/{thing_to_save}/train")
+    if outputs is not None: Utils.save_as_pickle(outputs, f"{outputs_dir}/train_{thing_to_save}.pkl")
+
+    # # evaluating validation set
+    # val_dataset = SCOPDataset(val_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
+    # val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
+    # print(f"Computing '{thing_to_save}' for val data of size {len(val_loader)}")
+    # outputs = test(model, val_loader, device, thing_to_save, where_to_save=f"{outputs_dir}/{thing_to_save}/val")
+    # if outputs is not None: Utils.save_as_pickle(outputs, f"{outputs_dir}/val_{thing_to_save}.pkl")
 
 
 
-    # evaluating test set
-    test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-    print(f"Computing '{thing_to_save}' for val data of size {len(test_loader)}")
-    outputs = test(model, test_loader, device, thing_to_save, where_to_save=f"{outputs_dir}/{thing_to_save}/test")
-    if outputs is not None: Utils.save_as_pickle(outputs, f"{outputs_dir}/test_{thing_to_save}.pkl")
+    # # evaluating test set
+    # test_dataset = SCOPDataset(test_data_file_path, class_dict, n_attn_heads, task, max_len, attn_type)
+    # test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+    # print(f"Computing '{thing_to_save}' for val data of size {len(test_loader)}")
+    # outputs = test(model, test_loader, device, thing_to_save, where_to_save=f"{outputs_dir}/{thing_to_save}/test")
+    # if outputs is not None: Utils.save_as_pickle(outputs, f"{outputs_dir}/test_{thing_to_save}.pkl")
