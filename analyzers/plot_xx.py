@@ -6,13 +6,13 @@ import pandas as pd
 import utils as Utils
 
 # read model generated outputs and converting to dataframe
-dir="outputs/predictions/"
-model_name="Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda"
-data_name="test" # "val"
-model_outputs = Utils.load_pickle(f"{dir}{model_name}_outputs_on_{data_name}.pkl")
+outputs_dir=f"outputs/predictions/Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda"
+data_name="train"# train, val, test
+things_saved = "last_layer_learned_rep" # ["y_pred_distribution", "last_layer_learned_rep", "all_layers_attn_weights", "embeddings"]
+model_outputs = Utils.load_pickle(f"{outputs_dir}/train_{things_saved}.pkl")
 # print(model_outputs[0]["last_layer_learned_rep"])
 
-df = pd.read_csv("data/splits/test_5862.txt")  #test_5862, val_4458
+df = pd.read_csv("data/splits/train_24538.txt")  #train_24538, test_5862, val_4458
 reps, labels = [], []
 for i in range(df.shape[0]):
     reps.append(model_outputs[i]["last_layer_learned_rep"]) 

@@ -29,15 +29,9 @@ apply_neighbor_aggregation=False
 device = "cuda" if torch.cuda.is_available() else "cpu" # "cpu"#
 out_filename = f"Model_{attn_type}_{task}_{max_len}_{dim_embed}_{n_attn_heads}_{dim_ff}_{n_encoder_layers}_{dropout}_{init_lr}_{n_epochs}_{batch_size}_{include_embed_layer}_{device}"#_{apply_neighbor_aggregation}"
 print(out_filename)
-# LocalModel_nobackbone_SF_512_32_8_128_5_0.1_0.0001_1000_16_True_cuda_False
 
 
-
-# debugging file paths
-# all_data_file_path="data/splits/debug/all_cleaned.txt" 
-# val_data_file_path="data/splits/debug/val_14.txt" 
-# test_data_file_path="data/splits/debug/test_16.txt"
-
+# Cannot use debugging files since the model is developed using specific number of classes
 # real file paths
 all_data_file_path="data/splits/all_cleaned.txt"
 train_data_file_path="data/splits/train_24538.txt"
