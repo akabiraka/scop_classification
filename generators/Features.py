@@ -53,7 +53,7 @@ cd = Features()
 
 n_rows_to_skip = 0
 n_rows_to_evalutate = 40000
-cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)
+cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)#=None)
 
 # i = 1 #0-based index
 # if "SLURM_ARRAY_TASK_ID" in os.environ:

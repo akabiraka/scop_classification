@@ -12,7 +12,8 @@
 #SBATCH --mem=16000MB                # Request nGB RAM per core
 ##SBATCH --array=0-10                         # distributed array job   
 
-python generators/DownloadCleanFasta.py
+## python generators/DownloadCleanFasta.py
+python generators/Features.py
 
 ## gpu
 ##SBATCH --partition=gpuq                    # the DGX only belongs in the 'gpu'  partition

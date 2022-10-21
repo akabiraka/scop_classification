@@ -40,4 +40,4 @@ dcf = DownloadCleanFasta()
 
 n_rows_to_skip = 0
 n_rows_to_evalutate = 40000
-dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path=None)
+dcf.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)#=None)
