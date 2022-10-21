@@ -27,6 +27,14 @@ class Features(IGenerator):
         out_feature_file = self.features_dir+pdb_id+chain_id+region+".pkl"
         out_dist_mat_file = self.distance_matrices_dir+pdb_id+chain_id+region+".pkl"
 
+        # amino acid one-hot feature
+        if os.path.exists(out_feature_file):
+            features = Utils.load_pickle(out_feature_file)
+        else:
+            features = self.protein_descriptor.get_all_node_features(cln_pdb_file, chain_id)
+            Utils.save_as_pickle(features, out_feature_file)
+        print(f"    Features: {features.shape}")
+        
         # dist_mat feature
         if os.path.exists(out_dist_mat_file): 
             dist_mat = Utils.load_pickle(out_dist_mat_file)
@@ -35,13 +43,6 @@ class Features(IGenerator):
             Utils.save_as_pickle(dist_mat, out_dist_mat_file)
         print(f"    Contact-map: {dist_mat.shape}")
 
-        # amino acid one-hot feature
-        if os.path.exists(out_feature_file):
-            features = Utils.load_pickle(out_feature_file)
-        else:
-            features = self.protein_descriptor.get_all_node_features(cln_pdb_file, chain_id)
-            Utils.save_as_pickle(features, out_feature_file)
-        print(f"    Features: {features.shape}")
 
         if dist_mat.shape[0]!=features.shape[0]: 
             raise Exception(f"{dist_mat.shape[0]}!={features.shape[0]} does not match")
