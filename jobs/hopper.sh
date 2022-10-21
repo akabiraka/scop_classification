@@ -10,7 +10,7 @@
 ##SBATCH --cpus-per-task=8                   # Request n   cores per node
 ##SBATCH --nodes=1                          # Request N nodes
 #SBATCH --mem=16000MB                # Request nGB RAM per core
-##SBATCH --array=0-10                         # distributed array job   
+##SBATCH --array=0-40000                         # distributed array job   
 
 ## python generators/DownloadCleanFasta.py
 python generators/Features.py

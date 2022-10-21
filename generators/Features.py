@@ -34,7 +34,7 @@ class Features(IGenerator):
             features = self.protein_descriptor.get_all_node_features(cln_pdb_file, chain_id)
             Utils.save_as_pickle(features, out_feature_file)
         print(f"    Features: {features.shape}")
-        
+
         # dist_mat feature
         if os.path.exists(out_dist_mat_file): 
             dist_mat = Utils.load_pickle(out_dist_mat_file)
@@ -52,11 +52,11 @@ out_file_path = "data/splits/cleaned_after_feature_computation.txt"
 df = pd.read_csv(inp_file_path)
 cd = Features()
 
-n_rows_to_skip = 0
-n_rows_to_evalutate = 40000
-cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)#=None)
+# n_rows_to_skip = 0
+# n_rows_to_evalutate = 40000
+# cd.do_linear(df, n_rows_to_skip, n_rows_to_evalutate, out_file_path)#=None)
 
 # i = 1 #0-based index
-# if "SLURM_ARRAY_TASK_ID" in os.environ:
-#     i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
-# cd.do_distributed(i, df, out_file_path)
+if "SLURM_ARRAY_TASK_ID" in os.environ:
+    i = int(os.environ["SLURM_ARRAY_TASK_ID"]) 
+cd.do_distributed(i, df, out_file_path)

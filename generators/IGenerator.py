@@ -1,5 +1,4 @@
 import sys
-from numpy import dtype
 sys.path.append("../scop_classification")
 import pandas as pd
 import os
@@ -47,6 +46,7 @@ class IGenerator(object):
         try:
             self.do(pdb_id, chain_id, region)
         except Exception as e:
+            print(str(e))
             if "DSSP failed" in str(e):
                 bad_df = bad_df.append(df.loc[i], ignore_index=True)
                 bad_df.reset_index(drop=True, inplace=True)
