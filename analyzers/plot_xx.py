@@ -15,7 +15,7 @@ model_outputs = Utils.load_pickle(f"{outputs_dir}/train_{things_saved}.pkl")
 # model_outputs = Utils.load_pickle("outputs/predictions/Model_contactmap_SF_512_256_8_1024_5_0.1_0.0001_1000_64_True_cuda_outputs_on_val.pkl") # for test and val
 # print(model_outputs[0]["last_layer_learned_rep"])
 
-df = pd.read_csv("data/splits/val_4458.txt")  #train_24538, test_5862, val_4458
+df = pd.read_csv("data/splits/train_24538.txt")  #train_24538, test_5862, val_4458
 reps, labels = [], []
 for i in range(df.shape[0]):
     reps.append(model_outputs[i]["last_layer_learned_rep"]) 

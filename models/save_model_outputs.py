@@ -64,6 +64,7 @@ def test(model, loader, device, thing_to_save, where_to_save=None):
     model.eval()
     outputs = []
     for i, (data, y_true) in enumerate(loader):
+        # if i<15985: continue
         print(i)
         x, key_padding_mask, attn_mask = data["src"].to(device), data["key_padding_mask"].to(device), data["attn_mask"].to(device)
         attn_mask = torch.cat([i for i in attn_mask])
