@@ -74,4 +74,19 @@
 #### 3rd party Softwares
 * DSSP installation: 
     * sudo apt install dssp, or
-    * Install anaconda and then conda install -c salilab dssp 
+    * Install anaconda and then conda install -c salilab dssp
+    * 
+## Citation
+If the model is found useful, we request to cite the relevant paper:
+```bibtex
+@INPROCEEDINGS{10030025,
+  author={Kabir, Anowarul and Shehu, Amarda},
+  booktitle={2022 IEEE International Conference on Knowledge Graph (ICKG)}, 
+  title={Sequence-Structure Embeddings via Protein Language Models Improve on Prediction Tasks}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={105-112},
+  keywords={Location awareness;Soft sensors;Semantics;Training data;Predictive models;Transformers;Protein sequence;Protein language model;Transformer;Sequence structure transformer;Protein function;superfamily},
+  doi={10.1109/ICKG55886.2022.00021}}
+```
