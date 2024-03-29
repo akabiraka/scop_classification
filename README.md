@@ -1,4 +1,4 @@
-# SCOP classification using Transformers
+# ProToFormer: Sequence-Structure Embeddings via Protein Language Models Improve on Prediction Tasks
 
 #### Data
 * SCOP data: [URL](https://scop.mrc-lmb.cam.ac.uk/files/scop-cla-latest.txt)
